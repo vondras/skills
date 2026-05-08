@@ -1,9 +1,54 @@
 ---
 name: test-driven-docs
 description: Use when a user wants to create, revise, or evaluate operational documentation by defining the reader questions it must answer and testing the document against those questions. Best for runbooks, ADRs, architecture docs, governance/process docs, implementation plans, onboarding docs, repo instructions, and multi-document audits where completeness, source-of-truth boundaries, or cross-document contradictions matter.
+tddoc:
+  version: 1
+  artifact_type: document
+  id: test-driven-docs-skill
+  title: Test-Driven Documentation Skill
+  audience:
+    primary:
+      - skill operator
+  purpose: >
+    Tell the skill operator when to invoke the skill, how to select the correct
+    mode, and where to find supporting resources for each phase.
+  non_goals:
+    - Provide the detailed phase-by-phase procedure (that is resources/workflow.md).
+    - Define artifact schemas (those are the resources/*.schema.yaml files).
+    - Provide evidence-bound evaluation instructions (that is resources/evaluator-prompt.md).
+  expected_reader_actions:
+    - Select the appropriate mode for the user request.
+    - Locate the supporting resource for the selected mode.
+    - Apply operating principles when authoring, evaluating, or auditing.
+  source_of_truth:
+    authority: authoritative_for_skill_entrypoint
+    precedence:
+      - This document is authoritative for skill triggers, mode selection, and operating principles.
+      - resources/workflow.md is authoritative for per-phase procedure.
+      - resources/document-set-audit.md is authoritative for Mode F composition rules.
+    conflict_resolution: >
+      If this document disagrees with resources/workflow.md on procedure,
+      resources/workflow.md wins. This document wins on trigger conditions and
+      mode selection criteria.
+  authoritative_for:
+    - skill trigger conditions
+    - mode selection criteria
+    - operating principles
+    - resource routing
+  related_documents:
+    - path: ./resources/workflow.md
+      relationship: elaborated_by
+    - path: ./resources/document-set-audit.md
+      relationship: elaborated_by
+    - path: ./resources/evaluator-prompt.md
+      relationship: elaborated_by
+    - path: ./resources/frontmatter-manifest.md
+      relationship: elaborated_by
+  tests:
+    suite: ./resources/skill.questions.yaml
 ---
 
-# Acceptance-Test-Driven Documentation
+# Test-Driven Documentation
 
 ## Purpose
 
@@ -57,7 +102,7 @@ More detail is in `resources/document-set-audit.md`.
 ## Operating principles
 
 - Treat the document or document set as an artifact with acceptance criteria.
-- Use YAML frontmatter as the document-local ATDD manifest when the document needs durable routing, ownership, source-of-truth, or evaluation metadata.
+- Use YAML frontmatter as the document-local test-driven-docs manifest when the document needs durable routing, ownership, source-of-truth, or evaluation metadata.
 - Keep full question suites and generated evaluations external by default; frontmatter should point to them unless the document is small enough for inline tests.
 - Define audience, purpose, non-goals, source-of-truth boundaries, and expected reader actions before authoring.
 - Organize tests by reader intent, not by planned document section.
@@ -81,15 +126,15 @@ Use these resources as needed:
 - `resources/contract.schema.yaml` — contract schema
 - `resources/questions.schema.yaml` — question/test-suite schema; supports `document` or `document_set`
 - `resources/evaluation.schema.yaml` — evaluation-result schema; supports single-document and document-set outputs
-- `resources/tddoc.frontmatter.schema.yaml` — document-local ATDD frontmatter manifest schema
+- `resources/tddoc.frontmatter.schema.yaml` — document-local test-driven-docs frontmatter manifest schema
 - `scripts/validate_artifacts.py` — deterministic YAML/schema/count validation helper
 
 ## Interaction rules
 
 - If the user gives a document and asks for review, evaluate before rewriting.
 - If the user gives only an idea, start with a contract and tests.
-- If the user supplies only a document and no test suite, first inspect any ATDD frontmatter for a referenced suite or inline tests; otherwise derive a test suite and label it as derived before evaluating.
-- If the user supplies multiple documents, use Mode F unless they explicitly ask to evaluate only one document. Use ATDD frontmatter to establish each document's role, authority, routing, and local tests when present.
+- If the user supplies only a document and no test suite, first inspect any test-driven-docs frontmatter for a referenced suite or inline tests; otherwise derive a test suite and label it as derived before evaluating.
+- If the user supplies multiple documents, use Mode F unless they explicitly ask to evaluate only one document. Use test-driven-docs frontmatter to establish each document's role, authority, routing, and local tests when present.
 - If evaluating something authored in the same session, evaluate adversarially and do not give credit for prior discussion or intent not present in the final document.
 - If the user asks for files, provide complete file contents or an updated package.
 - If the user asks for CI implementation, use deterministic checks where possible and mark LLM-based judgment as non-deterministic unless constrained by fixed model/version/settings.

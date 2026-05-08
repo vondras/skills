@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Validate acceptance-test-driven documentation skill artifacts.
+"""Validate test-driven-docs skill artifacts.
 
 Checks:
 - YAML syntax for schemas and examples
 - JSON Schema validity for contract/questions/evaluation/frontmatter examples
 - Evaluation summary counts match result statuses
 - Document-set cross-document summary counts match cross_document_findings
-- ATDD frontmatter referenced files and optional document hashes remain valid
+- test-driven-docs frontmatter referenced files and optional document hashes remain valid
 
 Usage:
   python scripts/validate_artifacts.py
@@ -187,6 +187,19 @@ def validate_evaluation_counts(path: Path) -> list[str]:
     return errors
 
 
+def validate_skill_entrypoint(path: Path) -> list[str]:
+    """Check that SKILL.md has non-empty name and description in frontmatter."""
+    frontmatter, _ = parse_markdown_frontmatter(path)
+    if frontmatter is None:
+        return [f"{path}: missing YAML frontmatter block"]
+    errors: list[str] = []
+    for field in ("name", "description"):
+        value = frontmatter.get(field)
+        if not isinstance(value, str) or not value.strip():
+            errors.append(f"{path}: frontmatter.{field} must be a non-empty string")
+    return errors
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
@@ -203,10 +216,23 @@ def main() -> int:
         except Exception as exc:  # noqa: BLE001
             errors.append(f"{path}: YAML parse failed: {exc}")
 
+    skill_md = root / "SKILL.md"
+    if skill_md.exists():
+        errors.extend(validate_skill_entrypoint(skill_md))
+
+    referenced_suites: list[Path] = []
     for path in sorted(root.rglob("*.md")):
         if path.name == "authoring-template.md":
             continue
         errors.extend(validate_frontmatter(path, schemas / "tddoc.frontmatter.schema.yaml"))
+        frontmatter, _ = parse_markdown_frontmatter(path)
+        if frontmatter and "tddoc" in frontmatter:
+            suite = (frontmatter.get("tddoc") or {}).get("tests", {}) or {}
+            suite_path_str = suite.get("suite") if isinstance(suite, dict) else None
+            if suite_path_str:
+                suite_path = (path.parent / suite_path_str).resolve()
+                if suite_path.exists():
+                    referenced_suites.append(suite_path)
 
     schema_pairs = [
         (schemas / "contract.schema.yaml", examples / "example.contract.yaml"),
@@ -215,6 +241,9 @@ def main() -> int:
         (schemas / "evaluation.schema.yaml", examples / "example.evaluation.yaml"),
         (schemas / "evaluation.schema.yaml", examples / "example.docset.evaluation.yaml"),
     ]
+    for suite_path in referenced_suites:
+        if suite_path not in {p for _, p in schema_pairs}:
+            schema_pairs.append((schemas / "questions.schema.yaml", suite_path))
 
     for schema_path, data_path in schema_pairs:
         if not data_path.exists():
@@ -231,7 +260,7 @@ def main() -> int:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    print("All ATDD skill artifacts validated successfully.")
+    print("All test-driven-docs skill artifacts validated successfully.")
     return 0
 
 

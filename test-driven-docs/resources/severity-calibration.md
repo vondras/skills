@@ -1,3 +1,44 @@
+---
+tddoc:
+  version: 1
+  artifact_type: document
+  id: test-driven-docs-severity-calibration
+  title: Severity Calibration
+  audience:
+    primary:
+      - test writer
+      - evaluator
+  purpose: >
+    Provide concrete examples for each severity level (critical, high, medium,
+    low) so that test writers classify tests consistently and evaluators apply
+    the correct blocking threshold.
+  non_goals:
+    - Define the full evaluation procedure (that is resources/evaluator-prompt.md).
+    - Define status definitions (that is resources/evaluator-prompt.md).
+  expected_reader_actions:
+    - Classify a new test as critical, high, medium, or low using the examples.
+    - Determine whether a finding should block release or generate a warning.
+  source_of_truth:
+    authority: authoritative_for_severity_calibration
+    precedence:
+      - This document is authoritative for severity classification examples and the blocking threshold.
+      - resources/evaluator-prompt.md is authoritative for overall-status rules and when blocking applies.
+    conflict_resolution: >
+      If this document and resources/evaluator-prompt.md disagree on whether a
+      finding blocks, resources/evaluator-prompt.md wins on the gate rule;
+      this document wins on the example-based classification.
+  authoritative_for:
+    - severity classification examples
+    - blocking threshold guidance
+  related_documents:
+    - path: ./evaluator-prompt.md
+      relationship: used_by
+    - path: ../SKILL.md
+      relationship: entry_point_for
+  tests:
+    suite: ./severity-calibration.questions.yaml
+---
+
 # Severity Calibration
 
 Use severity to limit edge-case explosion. Critical/high findings should usually block release or merge. Medium/low findings normally produce warnings unless the user defines stricter gates.

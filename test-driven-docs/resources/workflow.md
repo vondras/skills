@@ -1,7 +1,55 @@
-# Acceptance-Test-Driven Documentation Workflow
+---
+tddoc:
+  version: 1
+  artifact_type: document
+  id: test-driven-docs-workflow
+  title: Test-Driven Documentation Workflow
+  audience:
+    primary:
+      - skill operator
+  purpose: >
+    Describe the six phases of the test-driven documentation workflow and the
+    output shape for each mode (A–F), so that the skill operator knows exactly
+    what to produce at each step.
+  non_goals:
+    - Define when to invoke the skill or select a mode (that is SKILL.md).
+    - Define Mode F composition rules and gates (that is resources/document-set-audit.md).
+    - Provide evidence-bound evaluation instructions (that is resources/evaluator-prompt.md).
+  expected_reader_actions:
+    - Execute the correct phase sequence for the selected mode.
+    - Produce the prescribed output artifact for the selected mode.
+    - Apply frontmatter manifest rules during Phase 1 and Phase 4.
+  source_of_truth:
+    authority: authoritative_for_workflow_procedure
+    precedence:
+      - This document is authoritative for per-phase procedure and mode output shapes.
+      - resources/document-set-audit.md is authoritative for Mode F composition and gates.
+      - resources/evaluator-prompt.md is authoritative for evidence-bound evaluation rules.
+    conflict_resolution: >
+      If this document and resources/document-set-audit.md disagree on Mode F
+      procedure, resources/document-set-audit.md wins on composition and gates.
+  authoritative_for:
+    - phase execution order
+    - mode output shapes
+    - frontmatter manifest handling during workflow
+    - metadata drift handling
+  related_documents:
+    - path: ../SKILL.md
+      relationship: entry_point_for
+    - path: ./document-set-audit.md
+      relationship: elaborated_by
+    - path: ./evaluator-prompt.md
+      relationship: elaborated_by
+    - path: ./frontmatter-manifest.md
+      relationship: elaborated_by
+  tests:
+    suite: ./workflow.questions.yaml
+---
+
+# Test-Driven Documentation Workflow
 
 
-## ATDD frontmatter manifest
+## Test-driven-docs frontmatter manifest
 
 When a document has YAML frontmatter with an `tddoc` key, treat it as the document-local manifest. It is not the full artifact store unless it uses `tests_inline` for a small document.
 
@@ -25,9 +73,20 @@ Default precedence:
 
 For the full manifest shape, use `resources/frontmatter-manifest.md` and validate with `resources/tddoc.frontmatter.schema.yaml`.
 
+## Metadata drift
+
+Treat each of the following as a metadata-drift finding that fails evaluation and requires re-derivation or re-evaluation before continuing:
+
+- Referenced `tests.suite` file does not exist on disk.
+- Referenced `evaluation.latest` file does not exist on disk.
+- `evaluation.document_hash` does not match the current document body hash.
+- A path listed in `related_documents[].path` does not exist on disk.
+
+When metadata drift is detected: report the finding, fall back to deriving a minimal test suite or re-running evaluation as applicable, and flag the frontmatter as stale in the fix plan.
+
 ## Phase 1 — Document contract
 
-Before drafting, establish a contract. If the document already has ATDD frontmatter, use it as the starting contract manifest and check it for gaps or drift. If the user supplied enough context, infer a reasonable first version and label assumptions. If not, ask only the questions needed to avoid wasted work.
+Before drafting, establish a contract. If the document already has test-driven-docs frontmatter, use it as the starting contract manifest and check it for gaps or drift. If the user supplied enough context, infer a reasonable first version and label assumptions. If not, ask only the questions needed to avoid wasted work.
 
 Minimum contract:
 

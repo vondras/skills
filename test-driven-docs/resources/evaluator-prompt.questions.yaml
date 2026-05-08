@@ -1,0 +1,76 @@
+document_tests:
+  document: ./evaluator-prompt.md
+  tests:
+    - id: eval-evidence-001
+      category: governance
+      severity: critical
+      reader_role: evaluator
+      question: "What sources of information am I allowed to use as evidence when evaluating a document?"
+      expected_answer_properties:
+        - states only the supplied document(s) may be used as evidence
+        - prohibits outside knowledge
+        - prohibits unstated author intent
+        - prohibits credit for prior conversation context not present in the final document
+      failure_risk: "Evaluator passes tests using outside knowledge, making the evaluation unreliable."
+      blocking: true
+
+    - id: eval-status-001
+      category: decisions
+      severity: critical
+      reader_role: evaluator
+      question: "What are the five possible test statuses and when does each apply?"
+      expected_answer_properties:
+        - PASS fully answered with explicit evidence covering every expected property
+        - PARTIAL some properties answered or ambiguous or minor inference required
+        - FAIL not answered or too vague to act on
+        - CONTRADICTORY conflicting answers or incompatible rules
+        - NOT_APPLICABLE outside agreed scope with justification required
+      failure_risk: "Evaluator assigns PARTIAL when FAIL is correct, or PASS when inference was required."
+      blocking: true
+
+    - id: eval-result-fields-001
+      category: execution
+      severity: high
+      reader_role: evaluator
+      question: "What fields must every test result include?"
+      expected_answer_properties:
+        - id
+        - status
+        - severity
+        - blocking
+        - answer_from_document
+        - evidence list
+        - missing_properties list
+        - unsupported_inferences list
+        - risk
+        - minimal_fix
+      failure_risk: "Evaluator omits required fields and the result cannot be used by the fix plan or schema validator."
+      blocking: true
+
+    - id: eval-overall-status-001
+      category: decisions
+      severity: high
+      reader_role: evaluator
+      question: "What conditions produce fail, pass_with_warnings, and pass at the overall evaluation level?"
+      expected_answer_properties:
+        - fail when any blocking critical test is not PASS
+        - fail when any blocking high test is not PASS
+        - fail when any blocking contradiction exists
+        - fail when no document is authoritative for a critical/high reader action
+        - pass_with_warnings when all blocking critical/high pass but medium/low gaps remain
+        - pass only when all tests pass or are NOT_APPLICABLE
+      failure_risk: "Evaluator returns pass_with_warnings when a blocking critical failure should force fail."
+      blocking: true
+
+    - id: eval-set-rules-001
+      category: execution
+      severity: high
+      reader_role: evaluator
+      question: "How does evaluating a document set differ from evaluating a single document?"
+      expected_answer_properties:
+        - requires two layers per-document and set-level
+        - prohibits collapsing documents into a single undifferentiated corpus
+        - prohibits giving a document credit for an answer in another document unless it routes to it explicitly
+        - set-level results include found_in and expected_in fields
+      failure_risk: "Evaluator collapses the set into one corpus and grants cross-document credit, producing false passes."
+      blocking: true

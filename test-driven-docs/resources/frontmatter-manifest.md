@@ -1,6 +1,55 @@
-# ATDD Frontmatter Manifest
+---
+tddoc:
+  version: 1
+  artifact_type: document
+  id: test-driven-docs-frontmatter-manifest
+  title: Test-Driven-Docs Frontmatter Manifest
+  audience:
+    primary:
+      - document author
+    secondary:
+      - skill operator
+  purpose: >
+    Define the rules, field meanings, precedence ordering, and examples for
+    adding a tddoc YAML frontmatter manifest to a document, so that document
+    authors can make their documents discoverable, routable, and auditable.
+  non_goals:
+    - Define the full six-phase workflow (that is resources/workflow.md).
+    - Define evidence-bound evaluation rules (that is resources/evaluator-prompt.md).
+    - Serve as the machine-readable schema (that is resources/tddoc.frontmatter.schema.yaml).
+  expected_reader_actions:
+    - Add a tddoc frontmatter block to a document using the recommended manifest template.
+    - Choose between external tests.suite and inline tests_inline correctly.
+    - Apply the precedence rules when frontmatter and referenced artifacts disagree.
+    - Add an evaluation stamp after running a formal evaluation.
+  source_of_truth:
+    authority: authoritative_for_frontmatter_rules
+    precedence:
+      - This document is authoritative for frontmatter field semantics, precedence rules, and the external-vs-inline split.
+      - resources/tddoc.frontmatter.schema.yaml is authoritative for the machine-readable shape and required fields.
+    conflict_resolution: >
+      If this document and resources/tddoc.frontmatter.schema.yaml disagree on
+      required fields or allowed values, resources/tddoc.frontmatter.schema.yaml
+      wins on structure; this document wins on precedence rules and semantics.
+  authoritative_for:
+    - tddoc frontmatter field semantics
+    - external-vs-inline test split rules
+    - frontmatter precedence ordering
+    - evaluation stamp fields
+  related_documents:
+    - path: ./tddoc.frontmatter.schema.yaml
+      relationship: schema_for
+    - path: ../SKILL.md
+      relationship: entry_point_for
+    - path: ./workflow.md
+      relationship: used_by
+  tests:
+    suite: ./frontmatter-manifest.questions.yaml
+---
 
-Use YAML frontmatter as the document-local ATDD manifest. The manifest makes the document discoverable, routable, and auditable, but it should not become the full artifact store.
+# Test-Driven-Docs Frontmatter Manifest
+
+Use YAML frontmatter as the document-local test-driven-docs manifest. The manifest makes the document discoverable, routable, and auditable, but it should not become the full artifact store.
 
 ## Default split
 
@@ -11,7 +60,7 @@ Use YAML frontmatter as the document-local ATDD manifest. The manifest makes the
 
 ## Precedence
 
-When ATDD metadata appears in document frontmatter, apply this precedence:
+When test-driven-docs metadata appears in document frontmatter, apply this precedence:
 
 1. Explicit external files referenced by frontmatter are authoritative for full tests.
 2. Frontmatter is authoritative for document identity, role, audience, source-of-truth boundary, authoritative topics, document-set membership, and artifact routing.
@@ -97,6 +146,8 @@ tddoc:
 ```
 
 ## Inline tests
+
+A manifest must declare tests using either external `tests.suite` or inline `tests_inline`, never both. The schema enforces this constraint.
 
 Inline tests are acceptable for short ADRs, small repo instructions, or compact docs where an external file would add more overhead than value.
 

@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-title: "ATDD Document Frontmatter Manifest"
+title: "Test-Driven-Docs Document Frontmatter Manifest"
 type: object
 required:
   - tddoc

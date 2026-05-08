@@ -1,0 +1,68 @@
+document_tests:
+  document: ./document-set-audit.md
+  tests:
+    - id: dsa-composition-001
+      category: execution
+      severity: critical
+      reader_role: skill operator
+      question: "What two layers must every Mode F audit include, and what question does each layer answer?"
+      expected_answer_properties:
+        - identifies per-document evaluation as Layer 1 (can each document answer the questions it individually claims?)
+        - identifies set-level evaluation as Layer 2 (can the set function coherently for a reader moving across documents?)
+        - states that a corpus-level answer does not rescue a document that is expected to be independently complete
+      failure_risk: "Operator skips per-document evaluation and produces only a corpus-level pass, missing individual document failures."
+      blocking: true
+
+    - id: dsa-gate-001
+      category: decisions
+      severity: critical
+      reader_role: skill operator
+      question: "Under what conditions does Mode F return fail, pass_with_warnings, or pass?"
+      expected_answer_properties:
+        - fail when any per-document blocking critical/high test is not PASS
+        - fail when any set-level blocking critical/high test is not PASS
+        - fail when any blocking cross-document contradiction exists
+        - fail when no document is authoritative for a critical/high reader action
+        - pass_with_warnings when all blocking critical/high pass but medium/low gaps remain
+        - pass only when all tests pass or non-passing are NOT_APPLICABLE
+      failure_risk: "Operator returns pass_with_warnings when a blocking critical failure should force fail."
+      blocking: true
+
+    - id: dsa-procedure-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "What are the five procedure steps for a Mode F audit, in order?"
+      expected_answer_properties:
+        - step 1 inventory the set (roles, audience, authoritative topics, frontmatter)
+        - step 2 run per-document evaluation for each document
+        - step 3 build the set-level test suite
+        - step 4 run set-level evaluation
+        - step 5 consolidate the fix plan
+      failure_risk: "Operator runs set-level tests before completing per-document evaluation, producing incomplete results."
+      blocking: true
+
+    - id: dsa-fix-plan-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "How should I separate findings in the consolidated fix plan?"
+      expected_answer_properties:
+        - distinguishes per-document fixes (incomplete or ambiguous doc)
+        - distinguishes cross-document fixes (contradictions, drift, terminology)
+        - distinguishes set-level fixes (routing, missing doc, ownership model)
+      failure_risk: "Operator conflates per-document gaps with set-level routing issues, producing an unactionable fix plan."
+      blocking: false
+
+    - id: dsa-output-shape-001
+      category: execution
+      severity: medium
+      reader_role: skill operator
+      question: "What top-level fields must the Mode F evaluation output contain?"
+      expected_answer_properties:
+        - artifact_type document_set
+        - per_document_evaluations array
+        - set_level_evaluation with results and cross_document_findings
+        - consolidated_fix_plan
+      failure_risk: "Operator omits required fields and the output cannot be validated by the schema."
+      blocking: false
