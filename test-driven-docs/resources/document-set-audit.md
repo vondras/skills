@@ -1,3 +1,51 @@
+---
+tddoc:
+  version: 1
+  artifact_type: document
+  id: test-driven-docs-document-set-audit
+  title: Mode F — Document-Set Audit
+  audience:
+    primary:
+      - skill operator
+  purpose: >
+    Define the required composition, procedure, gate logic, and output shape for
+    Mode F document-set audits so that the skill operator can run a complete and
+    correct set-level evaluation.
+  non_goals:
+    - Define the general six-phase workflow (that is resources/workflow.md).
+    - Define evidence-bound evaluation rules for individual documents (that is resources/evaluator-prompt.md).
+    - Define mode selection criteria (that is SKILL.md).
+  expected_reader_actions:
+    - Inventory the document set and assign roles.
+    - Run per-document evaluation for each document in the set.
+    - Build and run the set-level test suite.
+    - Apply the gate logic to determine overall pass/fail.
+    - Produce output in the prescribed shape.
+  source_of_truth:
+    authority: authoritative_for_mode_f
+    precedence:
+      - This document is authoritative for Mode F composition, procedure, and gate logic.
+      - resources/workflow.md is authoritative for per-phase procedure for Modes A–E.
+      - resources/evaluator-prompt.md is authoritative for evidence-bound evaluation rules applied per document.
+    conflict_resolution: >
+      If resources/workflow.md and this document disagree on Mode F procedure,
+      this document wins.
+  authoritative_for:
+    - Mode F composition rules
+    - document-set audit procedure
+    - Mode F gate logic
+    - Mode F output shape
+  related_documents:
+    - path: ../SKILL.md
+      relationship: entry_point_for
+    - path: ./workflow.md
+      relationship: extends
+    - path: ./evaluator-prompt.md
+      relationship: uses
+  tests:
+    suite: ./document-set-audit.questions.yaml
+---
+
 # Mode F — Document-Set Audit
 
 A document-set audit evaluates a collection of related docs as a documentation system. It must not collapse the set into one big context blob and ask whether the answer exists somewhere.
@@ -24,7 +72,7 @@ A corpus-level answer does not rescue a document that is expected to be independ
 For each document, identify:
 
 - document name
-- ATDD frontmatter manifest, if present
+- test-driven-docs frontmatter manifest, if present
 - role in the set: entry point, runbook, reference, ADR, glossary, policy, tutorial, deep-dive, index, etc.
 - apparent or declared audience
 - topics it claims authority for via `authoritative_for`
@@ -37,7 +85,7 @@ For each document, identify:
 For each document:
 
 - Use the document's supplied contract/tests when present.
-- If the document has ATDD frontmatter, use referenced `tests.suite` or `tests_inline` before deriving tests.
+- If the document has test-driven-docs frontmatter, use referenced `tests.suite` or `tests_inline` before deriving tests.
 - If no tests exist, derive a minimal suite from frontmatter, title, purpose, apparent audience, headings, and role in the set.
 - Label derived tests as derived.
 - Evaluate using the same evidence rules as Mode D/E.
@@ -47,7 +95,8 @@ For each document:
 
 Set-level tests should cover:
 
-- reader routing: can a reader find the right doc for a task?
+- discoverability: using only document names, titles, and opening purpose statements, can a reader new to the set identify which document to consult for a given task — without a separate index or prior knowledge of the layout?
+- reader routing: do documents contain explicit cross-references and routing signals that guide readers once they are in the right place?
 - manifest consistency: do frontmatter IDs, document-set membership, related-doc links, and referenced artifacts line up?
 - source-of-truth boundaries: which doc/system is authoritative for each topic?
 - cross-document contradictions: factual or procedural disagreements
@@ -75,7 +124,7 @@ Separate fixes into:
 
 - **per-document fixes** — a specific doc is incomplete or ambiguous
 - **cross-document fixes** — contradictions, duplicated facts, terminology drift, or precedence conflicts
-- **set-level fixes** — missing index/routing, missing doc, missing ownership model, or source-of-truth map
+- **set-level fixes** — missing doc, missing ownership model, or source-of-truth map; for discoverability failures, prefer renaming a document, improving its title or purpose statement, or adding targeted cross-references over creating a new routing or index document
 
 ## Gate logic
 

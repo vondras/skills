@@ -1,0 +1,65 @@
+document_tests:
+  document: ./frontmatter-manifest.md
+  tests:
+    - id: fm-required-fields-001
+      category: execution
+      severity: critical
+      reader_role: document author
+      question: "Which tddoc frontmatter fields are required and which are optional?"
+      expected_answer_properties:
+        - identifies that version, artifact_type, id, title, audience.primary, purpose, and source_of_truth are required
+        - identifies at least three optional fields such as non_goals, expected_reader_actions, related_documents, tests, or freshness
+      failure_risk: "Author omits required fields and the document fails schema validation."
+      blocking: true
+
+    - id: fm-tests-choice-001
+      category: decisions
+      severity: high
+      reader_role: document author
+      question: "When should I use tests.suite versus tests_inline, and can I use both?"
+      expected_answer_properties:
+        - states tests_inline is for small or short documents where an external file adds overhead
+        - states tests.suite is the default for full test suites
+        - states that tests and tests_inline are mutually exclusive and must never both be set
+      failure_risk: "Author adds both tests and tests_inline, causing schema validation failure."
+      blocking: true
+
+    - id: fm-precedence-001
+      category: decisions
+      severity: high
+      reader_role: document author
+      question: "What is the precedence ordering when frontmatter and referenced artifacts disagree?"
+      expected_answer_properties:
+        - external question-suite files are authoritative for full tests
+        - frontmatter is authoritative for document identity, role, routing, and source-of-truth boundary
+        - generated evaluation files are attestations not source of truth
+        - disagreement between frontmatter and referenced artifacts fails evaluation with a metadata-drift finding
+      failure_risk: "Author believes the frontmatter evaluation stamp proves the document currently passes, leading to stale results."
+      blocking: true
+
+    - id: fm-evaluation-stamp-001
+      category: execution
+      severity: medium
+      reader_role: document author
+      question: "What fields make up the evaluation stamp in frontmatter, and what does each record?"
+      expected_answer_properties:
+        - latest path to the external evaluation file
+        - status last known evaluation status
+        - evaluated_at date of evaluation
+        - evaluator skill or tool that ran the evaluation
+        - document_hash sha256 of the document body at evaluation time
+      failure_risk: "Author adds a stamp without a document_hash and CI cannot detect document drift from the evaluation."
+      blocking: false
+
+    - id: fm-set-fields-001
+      category: execution
+      severity: medium
+      reader_role: document author
+      question: "Which frontmatter fields are especially useful for documents that are part of a larger document set?"
+      expected_answer_properties:
+        - document_set declares membership
+        - role_in_set declares the document role
+        - authoritative_for declares which topics this document owns
+        - related_documents links to related docs with relationship types
+      failure_risk: "Author omits set membership fields and Mode F cannot establish document roles or routing."
+      blocking: false

@@ -1,5 +1,5 @@
 $schema: "https://json-schema.org/draft/2020-12/schema"
-title: "Acceptance-Test-Driven Documentation Contract"
+title: "Test-Driven Documentation Contract"
 type: object
 required:
   - document_contract

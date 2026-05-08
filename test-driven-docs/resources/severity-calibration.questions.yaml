@@ -1,0 +1,47 @@
+document_tests:
+  document: ./severity-calibration.md
+  tests:
+    - id: sev-critical-001
+      category: decisions
+      severity: high
+      reader_role: test writer
+      question: "What distinguishes a critical-severity finding from a high-severity finding?"
+      expected_answer_properties:
+        - critical wrong or missing information can cause production, compliance, financial, security, safety, or governance harm
+        - high wrong or missing information causes blocked delivery, substantial rework, bad operational behavior, or durable drift
+        - provides at least one concrete example of each
+      failure_risk: "Test writer classifies a production-harm gap as high instead of critical, and it is not treated as blocking."
+      blocking: true
+
+    - id: sev-blocking-001
+      category: decisions
+      severity: high
+      reader_role: evaluator
+      question: "Which severity levels normally block release or merge?"
+      expected_answer_properties:
+        - critical and high findings should usually block release or merge
+        - medium and low normally produce warnings unless the user defines stricter gates
+      failure_risk: "Evaluator returns pass_with_warnings for a high-severity gap and the user ships a broken runbook."
+      blocking: true
+
+    - id: sev-medium-001
+      category: decisions
+      severity: medium
+      reader_role: test writer
+      question: "What kinds of gaps qualify as medium severity?"
+      expected_answer_properties:
+        - local confusion, inconsistent execution, minor rework, or avoidable support questions
+        - provides at least one concrete example
+      failure_risk: "Test writer marks a medium gap as critical, inflating the blocking count."
+      blocking: false
+
+    - id: sev-low-001
+      category: decisions
+      severity: low
+      reader_role: test writer
+      question: "What kinds of gaps qualify as low severity?"
+      expected_answer_properties:
+        - mainly affects polish, convenience, or discoverability
+        - provides at least one concrete example
+      failure_risk: "Test writer has no reference for low severity and over-classifies polish issues as medium."
+      blocking: false

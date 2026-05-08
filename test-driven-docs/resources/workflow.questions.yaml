@@ -1,0 +1,63 @@
+document_tests:
+  document: ./workflow.md
+  tests:
+    - id: workflow-phase-order-001
+      category: execution
+      severity: critical
+      reader_role: skill operator
+      question: "What is the standard phase sequence, and what is the minimum output of each phase?"
+      expected_answer_properties:
+        - names all six phases in order (contract, questions, tests, author/revise, evaluate, remediate)
+        - describes the minimum artifact or output for each phase
+      failure_risk: "Operator skips phases or produces the wrong artifact type for a phase."
+      blocking: true
+
+    - id: workflow-mode-output-001
+      category: decisions
+      severity: high
+      reader_role: skill operator
+      question: "What output shape should I produce for each mode (A–F)?"
+      expected_answer_properties:
+        - defines output structure for Mode A (contract only)
+        - defines output structure for Mode B (test suite only)
+        - defines output structure for Mode D (evaluation)
+        - defines output structure for Mode E (full workflow)
+        - routes Mode F to resources/document-set-audit.md
+      failure_risk: "Operator delivers the wrong artifact type and the user cannot act on the output."
+      blocking: true
+
+    - id: workflow-frontmatter-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "How should I use test-driven-docs frontmatter when it is present in a document being worked on?"
+      expected_answer_properties:
+        - states to use frontmatter as the starting contract manifest in Phase 1
+        - states that referenced tests.suite takes precedence over derived tests
+        - identifies what frontmatter is authoritative for (identity, routing, source-of-truth, tests pointer)
+      failure_risk: "Operator ignores frontmatter and re-derives the contract and tests, producing unnecessary work or drift."
+      blocking: true
+
+    - id: workflow-metadata-drift-001
+      category: edge-cases
+      severity: high
+      reader_role: skill operator
+      question: "What should I do when a referenced test suite file is missing, an evaluation file is missing, or a document_hash mismatches?"
+      expected_answer_properties:
+        - identifies these as metadata-drift findings
+        - states to fail evaluation with a metadata-drift finding
+        - states to fall back to deriving tests or re-running evaluation
+        - states to flag frontmatter as stale in the fix plan
+      failure_risk: "Operator silently continues with a stale evaluation stamp or missing suite, producing incorrect results."
+      blocking: true
+
+    - id: workflow-pacing-001
+      category: decisions
+      severity: medium
+      reader_role: skill operator
+      question: "When should I deliver phases incrementally versus all at once in Mode E?"
+      expected_answer_properties:
+        - states to default to phase-by-phase delivery for real documents
+        - states the condition under which everything-at-once is acceptable
+      failure_risk: "Operator dumps all artifacts in one response for a complex document, overwhelming the user."
+      blocking: false

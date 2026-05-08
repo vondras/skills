@@ -8,6 +8,8 @@ document_tests:
     - production API integrator
     - support engineer
   coverage_model:
+    - category: discoverability
+      purpose: "A reader new to the set can identify the right document for their concern from names and titles alone."
     - category: orientation
       purpose: "Reader can make the first successful API call and know where to continue."
     - category: authentication
@@ -17,6 +19,18 @@ document_tests:
     - category: governance
       purpose: "Reader can identify authoritative docs when the set disagrees."
   tests:
+    - id: discoverability-001
+      category: discoverability
+      severity: high
+      reader_role: new API consumer
+      question: "Using only the document names and titles in this set, can a reader who has never seen the API reference before correctly identify which document covers authentication and which covers rate limits — without opening any document?"
+      expected_answer_properties:
+        - document names or titles are distinct and do not overlap in apparent scope
+        - a reader can map each concern (getting started, authenticating, rate limiting) to a single document from its name alone
+      failure_risk: "New readers open the wrong document first, fail to find production requirements, and either escalate or implement incorrectly."
+      blocking: false
+      acceptable_documents: any
+
     - id: orientation-001
       category: orientation
       severity: high
