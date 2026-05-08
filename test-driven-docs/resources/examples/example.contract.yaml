@@ -1,0 +1,25 @@
+document_contract:
+  title: "S3-to-Snowflake External Table Ingestion Runbook"
+  audience:
+    primary:
+      - data platform engineer
+      - analytics engineer
+    secondary:
+      - release owner
+      - support engineer
+  purpose: "Explain how files dropped into an S3 bucket are automatically discovered and made available to dbt staging models in Snowflake."
+  non_goals:
+    - "Define the upstream vendor file contract."
+    - "Replace Terraform module documentation."
+    - "Document all Snowflake external table features."
+  expected_reader_actions:
+    - "Configure or review the required AWS notification resources."
+    - "Configure or review the Snowflake storage integration, stage, file format, and external table."
+    - "Run or review dbt models that depend on the external table."
+    - "Diagnose why a newly dropped file is not visible downstream."
+  source_of_truth_boundary: "This runbook is authoritative for the ingestion operating procedure. Terraform remains authoritative for AWS infrastructure. Snowflake DDL/dbt code remain authoritative for deployed database objects."
+  freshness_expectation: "Review quarterly and whenever the bucket, notification path, Snowflake integration, or dbt external table configuration changes."
+  success_criteria:
+    - "A reader can explain the end-to-end ingestion path."
+    - "A reader can identify which component owns each responsibility."
+    - "A reader can diagnose common missing-file scenarios."

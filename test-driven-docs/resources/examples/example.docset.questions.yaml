@@ -1,0 +1,77 @@
+document_tests:
+  document_set:
+    - "getting-started.md"
+    - "authentication.md"
+    - "rate-limits.md"
+  audience:
+    - new API consumer
+    - production API integrator
+    - support engineer
+  coverage_model:
+    - category: orientation
+      purpose: "Reader can make the first successful API call and know where to continue."
+    - category: authentication
+      purpose: "Reader can choose and operate the right authentication method."
+    - category: operations
+      purpose: "Reader can handle rate limits and errors safely."
+    - category: governance
+      purpose: "Reader can identify authoritative docs when the set disagrees."
+  tests:
+    - id: orientation-001
+      category: orientation
+      severity: high
+      reader_role: new API consumer
+      question: "How do I make my first successful API call, and where do I go next for production setup?"
+      expected_answer_properties:
+        - gives base URL
+        - gives minimal authentication path
+        - gives a working request example
+        - routes to authentication details
+        - routes to rate-limit behavior
+      failure_risk: "Reader may complete a quick start but miss production requirements."
+      blocking: true
+      expected_documents:
+        - "getting-started.md"
+
+    - id: auth-001
+      category: authentication
+      severity: critical
+      reader_role: production API integrator
+      question: "Which authentication method should I use in production, how are credentials rotated, and how does that relate to the quick-start token?"
+      expected_answer_properties:
+        - lists supported authentication methods
+        - recommends method by use case
+        - explains credential/token rotation
+        - reconciles quick-start terminology with reference terminology
+      failure_risk: "Production integrations may use the wrong authentication method or lack a rotation plan."
+      blocking: true
+      expected_documents:
+        - "authentication.md"
+
+    - id: rate-limits-001
+      category: operations
+      severity: critical
+      reader_role: production API integrator
+      question: "What rate limit applies, how is it scoped, and how should a client respond to 429 responses?"
+      expected_answer_properties:
+        - states rate limit value
+        - states whether the limit is per-key, per-user, per-tenant, or global
+        - documents rate-limit headers
+        - describes retry/backoff behavior
+      failure_risk: "Clients may overload the API or handle throttling incorrectly."
+      blocking: true
+      expected_documents:
+        - "rate-limits.md"
+
+    - id: governance-001
+      category: governance
+      severity: high
+      reader_role: support engineer
+      question: "When documents disagree, which document is authoritative for each API topic?"
+      expected_answer_properties:
+        - identifies authoritative document per topic
+        - explains precedence when docs disagree
+        - identifies owner or update path for drift
+      failure_risk: "Readers act on whichever stale document they found first."
+      blocking: true
+      acceptable_documents: any

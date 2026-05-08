@@ -1,0 +1,134 @@
+# Worked example evaluation for the S3-to-Snowflake ingestion runbook.
+# This shows what `evaluation.schema.yaml`-conforming output looks like when
+# the document under review has a mix of complete, partial, and missing answers.
+# The hypothetical document being evaluated is a draft runbook that covers the
+# happy path well but is thin on validation procedures and source-of-truth detail.
+
+evaluation:
+  artifact_type: single_document
+  document: "s3-to-snowflake-external-table-ingestion-runbook.md"
+  overall_status: fail
+  summary:
+    total: 4
+    passed: 1
+    partial: 2
+    failed: 1
+    contradictory: 0
+    not_applicable: 0
+  results:
+    - id: orientation-001
+      status: PASS
+      severity: high
+      blocking: true
+      answer_from_document: >
+        Files dropped into s3://acme-vendor-feeds/sales/ trigger an EventBridge
+        notification that calls a Snowflake auto-refresh on the EXT_VENDOR_SALES
+        external table. dbt staging models read from this external table on
+        their normal hourly schedule. Files are typically queryable within 5
+        minutes of arrival and visible in dbt staging within the next hourly run.
+      evidence:
+        - "Section 'End-to-End Path', paragraphs 1-2"
+        - "Diagram 'Ingestion Flow' (S3 -> EventBridge -> Snowflake -> dbt)"
+        - "Section 'Latency Expectations', sentence 1"
+      missing_properties: []
+      unsupported_inferences: []
+      risk: ""
+      minimal_fix: ""
+
+    - id: execution-001
+      status: PARTIAL
+      severity: critical
+      blocking: true
+      answer_from_document: >
+        The runbook lists the S3 bucket, the IAM role used by the Snowflake
+        storage integration, the EventBridge rule, the Snowflake storage
+        integration, the external stage, the file format, and the external
+        table. dbt source configuration is referenced but the staging model
+        dependency is not described and no naming convention is given.
+      evidence:
+        - "Section 'Required Components' (component table)"
+        - "Section 'Snowflake Objects' (DDL excerpts for stage, file format, external table)"
+        - "Section 'dbt Integration' (one sentence: 'dbt sources read from EXT_VENDOR_SALES')"
+      missing_properties:
+        - "dbt source YAML pattern is not shown or linked"
+        - "staging model naming convention is not stated"
+      unsupported_inferences:
+        - "Reader must assume the dbt source name matches the external table name."
+      risk: >
+        A reader configuring a new feed could create the AWS and Snowflake
+        components correctly but miss the dbt source/model wiring, causing data
+        to land in Snowflake but never appear in downstream dbt models or BI.
+      minimal_fix: >
+        Add a 'dbt source and staging model' subsection under 'Required
+        Components' with the source YAML pattern, the staging model naming
+        convention, and a link to the relevant dbt project directory.
+
+    - id: operations-001
+      status: FAIL
+      severity: critical
+      blocking: true
+      answer_from_document: >
+        The runbook says to 'check that the file is queryable in Snowflake' but
+        provides no validation procedure for the AWS notification layer, no
+        Snowflake refresh-history check, and no dbt-side visibility check.
+      evidence:
+        - "Section 'Validation' (single sentence)"
+      missing_properties:
+        - "AWS notification validation point (e.g., EventBridge rule invocation count, CloudWatch metric)"
+        - "Snowflake metadata validation (e.g., REFRESH_HISTORY, COPY_HISTORY, AUTO_REFRESH status)"
+        - "SQL query or dbt command to confirm downstream visibility"
+        - "Expected failure signals at each layer"
+      unsupported_inferences:
+        - "Reader must invent their own validation queries for each layer."
+      risk: >
+        Support engineers cannot localize a failure to the correct layer, which
+        increases MTTR and produces misdirected fixes (e.g., re-deploying
+        Snowflake DDL when the actual issue is a missing EventBridge target).
+      minimal_fix: >
+        Replace the 'Validation' section with a four-step checklist:
+        (1) confirm the S3 object exists,
+        (2) confirm the EventBridge rule fired (AWS console or CLI command),
+        (3) confirm Snowflake auto-refresh saw the file (REFRESH_HISTORY query),
+        (4) confirm dbt source freshness or run a SELECT against the staging
+        model. Include the SQL and CLI commands inline for each step.
+
+    - id: governance-001
+      status: PARTIAL
+      severity: high
+      blocking: true
+      answer_from_document: >
+        The runbook states that Terraform is the source of truth for AWS
+        infrastructure and that Snowflake DDL is the source of truth for
+        deployed database objects. It does not state precedence between the
+        runbook and the dbt project, does not name an owner responsible for
+        reconciling drift, and does not describe how the runbook itself is
+        updated after drift is found.
+      evidence:
+        - "Section 'Source of Truth', paragraph 1"
+      missing_properties:
+        - "Precedence ordering when runbook and dbt project disagree"
+        - "Named owner for drift reconciliation"
+        - "Where deployed truth is verified (Snowflake account/role, repo paths)"
+        - "Update process for the runbook after drift is found"
+      unsupported_inferences:
+        - "Reader must assume the standard Terraform PR review process applies to drift correction."
+      risk: >
+        Drift between the runbook and deployed configuration may go uncorrected,
+        eroding trust in the runbook and causing teams to bypass it during
+        incidents.
+      minimal_fix: >
+        Extend the 'Source of Truth' section with: a complete precedence list
+        including the dbt project; the named team or role accountable for
+        drift reconciliation; the verification queries or repo paths that
+        constitute 'deployed truth'; and the standard PR/update process for
+        the runbook itself.
+
+  blocking_findings:
+    - "operations-001 (FAIL, critical, blocking): no per-layer validation procedure"
+    - "execution-001 (PARTIAL, critical, blocking): dbt source/staging model wiring missing"
+    - "governance-001 (PARTIAL, high, blocking): incomplete source-of-truth precedence and ownership"
+
+  recommended_next_changes:
+    - "Add a per-layer validation checklist with concrete commands."
+    - "Document the dbt source/staging model naming convention or link to it."
+    - "Complete the source-of-truth precedence list and name a drift-reconciliation owner."

@@ -1,0 +1,299 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Documentation Evaluation Result"
+type: object
+required:
+  - evaluation
+additionalProperties: false
+properties:
+  evaluation:
+    type: object
+    required:
+      - artifact_type
+      - overall_status
+      - summary
+    oneOf:
+      - properties:
+          artifact_type:
+            const: single_document
+        required:
+          - document
+          - results
+        not:
+          anyOf:
+            - required: ["document_set"]
+            - required: ["per_document_evaluations"]
+            - required: ["set_level_evaluation"]
+      - properties:
+          artifact_type:
+            const: document_set
+        required:
+          - document_set
+          - set_inventory
+          - per_document_evaluations
+          - set_level_evaluation
+          - consolidated_fix_plan
+        not:
+          required: ["document"]
+    additionalProperties: false
+    properties:
+      artifact_type:
+        type: string
+        enum: [single_document, document_set]
+      document:
+        type: string
+        minLength: 1
+      document_set:
+        type: array
+        minItems: 2
+        items:
+          type: string
+          minLength: 1
+      set_inventory:
+        type: array
+        items:
+          type: object
+          required: [document, role]
+          additionalProperties: false
+          properties:
+            document:
+              type: string
+              minLength: 1
+            role:
+              type: string
+              minLength: 1
+            audience:
+              type: string
+            owns_topics:
+              type: array
+              items:
+                type: string
+            references_topics:
+              type: array
+              items:
+                type: string
+      overall_status:
+        type: string
+        enum: [pass, fail, pass_with_warnings]
+      summary:
+        $ref: "#/$defs/summary"
+      results:
+        type: array
+        items:
+          $ref: "#/$defs/result"
+      per_document_evaluations:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+            - document
+            - overall_status
+            - summary
+            - results
+          additionalProperties: false
+          properties:
+            document:
+              type: string
+              minLength: 1
+            overall_status:
+              type: string
+              enum: [pass, fail, pass_with_warnings]
+            summary:
+              $ref: "#/$defs/summary"
+            results:
+              type: array
+              items:
+                $ref: "#/$defs/result"
+            blocking_findings:
+              type: array
+              items:
+                type: string
+            recommended_next_changes:
+              type: array
+              items:
+                type: string
+      set_level_evaluation:
+        type: object
+        required:
+          - summary
+          - results
+          - cross_document_findings
+        additionalProperties: false
+        properties:
+          summary:
+            $ref: "#/$defs/summary"
+          results:
+            type: array
+            items:
+              $ref: "#/$defs/result"
+          cross_document_findings:
+            type: array
+            items:
+              $ref: "#/$defs/cross_document_finding"
+          blocking_findings:
+            type: array
+            items:
+              type: string
+          recommended_next_changes:
+            type: array
+            items:
+              type: string
+      blocking_findings:
+        type: array
+        items:
+          type: string
+      recommended_next_changes:
+        type: array
+        items:
+          type: string
+      consolidated_fix_plan:
+        type: array
+        items:
+          type: object
+          required: [target, kind, reason, fix]
+          additionalProperties: false
+          properties:
+            target:
+              type: string
+              minLength: 1
+            kind:
+              type: string
+              enum: [per_document, cross_document, set_level]
+            reason:
+              type: string
+              minLength: 1
+            fix:
+              type: string
+              minLength: 1
+$defs:
+  summary:
+    type: object
+    required:
+      - total
+      - passed
+      - partial
+      - failed
+      - contradictory
+      - not_applicable
+    additionalProperties: false
+    properties:
+      total:
+        type: integer
+        minimum: 0
+      passed:
+        type: integer
+        minimum: 0
+      partial:
+        type: integer
+        minimum: 0
+      failed:
+        type: integer
+        minimum: 0
+      contradictory:
+        description: "Count of test results with status CONTRADICTORY. Cross-document contradictions are counted separately in cross_document_findings."
+        type: integer
+        minimum: 0
+      not_applicable:
+        type: integer
+        minimum: 0
+      cross_document_findings:
+        type: integer
+        minimum: 0
+      cross_document_contradictions:
+        type: integer
+        minimum: 0
+      blocking_findings:
+        type: integer
+        minimum: 0
+  result:
+    type: object
+    required:
+      - id
+      - status
+      - severity
+      - blocking
+      - answer_from_document
+      - evidence
+      - missing_properties
+      - unsupported_inferences
+      - risk
+      - minimal_fix
+    additionalProperties: false
+    properties:
+      id:
+        type: string
+      status:
+        type: string
+        enum: [PASS, PARTIAL, FAIL, CONTRADICTORY, NOT_APPLICABLE]
+      severity:
+        type: string
+        enum: [critical, high, medium, low]
+      blocking:
+        type: boolean
+      answer_from_document:
+        type: string
+      evidence:
+        type: array
+        items:
+          type: string
+      found_in:
+        type: array
+        items:
+          type: object
+          required: [document, extent]
+          additionalProperties: false
+          properties:
+            document:
+              type: string
+              minLength: 1
+            extent:
+              type: string
+              enum: [full, partial, mention_only, none]
+            notes:
+              type: string
+      expected_in:
+        type: array
+        items:
+          type: string
+      missing_properties:
+        type: array
+        items:
+          type: string
+      unsupported_inferences:
+        type: array
+        items:
+          type: string
+      risk:
+        type: string
+      minimal_fix:
+        type: string
+  cross_document_finding:
+    type: object
+    required:
+      - kind
+      - documents_involved
+      - description
+      - severity
+      - blocking
+      - minimal_fix
+    additionalProperties: false
+    properties:
+      kind:
+        type: string
+        enum: [CONTRADICTION, DUPLICATION, DRIFT, ROUTING_GAP, MISSING_AUTHORITATIVE_SOURCE]
+      documents_involved:
+        type: array
+        minItems: 1
+        items:
+          type: string
+      description:
+        type: string
+        minLength: 1
+      severity:
+        type: string
+        enum: [critical, high, medium, low]
+      blocking:
+        type: boolean
+      minimal_fix:
+        type: string
+        minLength: 1

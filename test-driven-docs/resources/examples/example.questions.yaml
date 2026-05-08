@@ -1,0 +1,73 @@
+document_tests:
+  document: "s3-to-snowflake-external-table-ingestion-runbook.md"
+  audience:
+    - data platform engineer
+    - analytics engineer
+    - support engineer
+  coverage_model:
+    - category: orientation
+      purpose: "Reader understands the ingestion path and whether the document applies."
+    - category: execution
+      purpose: "Reader can configure or review the required infrastructure and database pieces."
+    - category: operations
+      purpose: "Reader can validate ingestion and diagnose failures."
+    - category: governance
+      purpose: "Reader understands source-of-truth boundaries and ownership."
+  tests:
+    - id: orientation-001
+      category: orientation
+      severity: high
+      reader_role: analytics engineer
+      question: "What is the end-to-end path from S3 file drop to dbt staging model availability?"
+      expected_answer_properties:
+        - identifies S3 bucket/prefix as landing point
+        - identifies AWS notification mechanism
+        - identifies Snowflake stage/external table refresh path
+        - identifies dbt staging model dependency
+        - explains expected latency or freshness boundary
+      failure_risk: "Reader may troubleshoot the wrong layer or expect files to appear without refresh/notification plumbing."
+      blocking: true
+
+    - id: execution-001
+      category: execution
+      severity: critical
+      reader_role: data platform engineer
+      question: "What infrastructure and Snowflake objects must exist before automatic ingestion can work?"
+      expected_answer_properties:
+        - S3 bucket or prefix
+        - IAM role or storage integration permissions
+        - notification resource such as SQS/SNS/EventBridge as applicable
+        - Snowflake storage integration
+        - external stage
+        - file format
+        - external table
+        - dbt source/model configuration
+      failure_risk: "Automatic ingestion may be assumed complete while a required component is missing."
+      blocking: true
+
+    - id: operations-001
+      category: operations
+      severity: critical
+      reader_role: support engineer
+      question: "How do I validate that a newly dropped file was discovered and is queryable?"
+      expected_answer_properties:
+        - gives the file-drop validation point
+        - gives AWS notification validation point
+        - gives Snowflake metadata or refresh validation point
+        - gives SQL query or dbt command to confirm downstream visibility
+        - states expected failure signals
+      failure_risk: "Support cannot distinguish upstream delivery failure, notification failure, Snowflake refresh failure, and dbt model failure."
+      blocking: true
+
+    - id: governance-001
+      category: governance
+      severity: high
+      reader_role: release owner
+      question: "Which artifact is the source of truth when the runbook, Terraform, Snowflake DDL, and dbt project disagree?"
+      expected_answer_properties:
+        - defines precedence order
+        - identifies owner for reconciliation
+        - states where deployed truth is verified
+        - states how the runbook should be updated after drift is found
+      failure_risk: "Teams may follow stale prose instead of deployed configuration or fail to correct drift."
+      blocking: true
