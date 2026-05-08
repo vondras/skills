@@ -92,7 +92,7 @@ When metadata drift is detected: report the finding, fall back to deriving a min
 
 ## Phase 1 — Document contract
 
-Before drafting, establish a contract. If the document already has test-driven-docs frontmatter, use it as the starting contract manifest and check it for gaps or drift. Treat the referenced `tests.suite` as authoritative for the test suite — do not re-derive tests unless the suite file is missing or has metadata drift. Do not treat any `evaluation.status` stamp in frontmatter as proof the document currently passes; evaluation stamps are attestations of a prior run only. If the user supplied enough context, infer a reasonable first version and label assumptions. If not, ask only the questions needed to avoid wasted work.
+Before drafting, establish a contract. If the document already has test-driven-docs frontmatter, use it as the starting contract manifest and check it for gaps or drift. Load the referenced `tests.suite` as the starting test suite — do not re-derive from scratch — but still run the suite expansion pass (see Suite expansion below) to surface any coverage gaps or logically-implied tests the suite may be missing. Do not treat any `evaluation.status` stamp in frontmatter as proof the document currently passes; evaluation stamps are attestations of a prior run only. If the user supplied enough context, infer a reasonable first version and label assumptions. If not, ask only the questions needed to avoid wasted work.
 
 Minimum contract:
 
