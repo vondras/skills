@@ -88,3 +88,18 @@ document_tests:
         - states candidates are emitted under suite_expansion fix-plan category
       failure_risk: "Evaluator treats the supplied suite as complete, missing untested content and logically-implied gaps."
       blocking: true
+
+    - id: eval-two-phase-001
+      category: execution
+      severity: high
+      reader_role: evaluator
+      question: "Does the evaluator prompt require a two-phase flow where the initial reading pass uses only question, reader_role, and document body — and does not expose expected_answer_properties, failure_risk, or tddoc frontmatter until grading?"
+      expected_answer_properties:
+        - defines a two-phase model
+        - states the initial reading pass uses question and reader_role
+        - states document body is used in Phase 1
+        - explicitly states tddoc frontmatter is excluded from Phase 1
+        - explicitly says expected_answer_properties is grading-only
+        - explicitly says failure_risk is grading-only
+      failure_risk: "Evaluator gets primed by rubric fields or frontmatter and returns biased false passes or suppressed independent risk findings."
+      blocking: true

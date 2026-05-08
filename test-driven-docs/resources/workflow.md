@@ -223,11 +223,23 @@ Use only the sections that fit the artifact.
 
 Evaluate using only the supplied document(s). Do not rely on outside knowledge, common sense, or prior author intent.
 
-For each test, produce:
+Use a two-phase flow:
+
+1. **Phase 1 — Evaluator reading pass**: use only `question` and `reader_role` (plus the document body) to produce an answer, evidence, and identified gaps/ambiguities. Do not read or use the `tddoc` frontmatter block — a human reader would not see it. Do not expose or use `expected_answer_properties` or `failure_risk` during this phase.
+2. **Phase 2 — Grading pass**: apply `expected_answer_properties` and `failure_risk` to assign status and complete all grading fields.
+
+This model uses a single evaluator agent with phased instructions (soft convention) rather than two separate agent invocations.
+
+**Design decisions:**
+- Hard vs. soft separation: soft (single agent, phased instructions). Equivalent bias-reduction; lower coordination cost.
+- `failure_risk` is not renamed. Schema descriptions mark it as grading-only; a rename would require updating all existing `.questions.yaml` files.
+- `reader_role` is sufficient Phase 1 context. `tddoc` frontmatter is excluded — a human reader cannot see it.
+
+For each test result, produce:
 
 - status: PASS, PARTIAL, FAIL, CONTRADICTORY, or NOT_APPLICABLE
-- answer found in the document(s)
-- supporting evidence from the document(s)
+- answer found in the document body
+- supporting evidence from the document body
 - missing expected answer properties
 - unsupported assumptions or inferences
 - operational/documentation risk
