@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pyyaml jsonschema
+
+      - name: Validate skill structure
+        run: |
+          set -euo pipefail
+          errors=0
+          for skill_dir in */; do
+            skill_dir="${skill_dir%/}"
+            skill_md="$skill_dir/SKILL.md"
+            if [ ! -f "$skill_md" ]; then
+              echo "ERROR: $skill_dir is missing SKILL.md" >&2
+              errors=$((errors + 1))
+              continue
+            fi
+            if ! grep -q "^name:" "$skill_md"; then
+              echo "ERROR: $skill_md is missing 'name:' in frontmatter" >&2
+              errors=$((errors + 1))
+            fi
+            if ! grep -q "^description:" "$skill_md"; then
+              echo "ERROR: $skill_md is missing 'description:' in frontmatter" >&2
+              errors=$((errors + 1))
+            fi
+          done
+          [ "$errors" -eq 0 ] || exit 1
+          echo "Skill structure valid."
+
+      - name: Run skill artifact validators
+        run: |
+          set -euo pipefail
+          ran=0
+          for script in */scripts/validate_artifacts.py; do
+            [ -f "$script" ] || continue
+            skill_dir="${script%%/*}"
+            echo "--- Validating $skill_dir ---"
+            python "$script" --root "$skill_dir"
+            ran=$((ran + 1))
+          done
+          echo "Ran $ran validator(s)."

@@ -1,0 +1,339 @@
+# Worked document-set audit example.
+# Shows Mode F as per-document evaluation plus set-level audit.
+
+evaluation:
+  artifact_type: document_set
+  document_set:
+    - "getting-started.md"
+    - "authentication.md"
+    - "rate-limits.md"
+
+  set_inventory:
+    - document: "getting-started.md"
+      role: "Entry point and quick-start for the first API call."
+      audience: "new API consumer"
+      owns_topics:
+        - "first request"
+        - "initial navigation"
+      references_topics:
+        - "authentication"
+        - "rate limits"
+    - document: "authentication.md"
+      role: "Reference for credentials, token issuance, and rotation."
+      audience: "API consumer setting up production integration"
+      owns_topics:
+        - "authentication methods"
+        - "credential lifecycle"
+      references_topics: []
+    - document: "rate-limits.md"
+      role: "Reference for rate-limit policy and client behavior."
+      audience: "API consumer scaling usage"
+      owns_topics:
+        - "rate limit values"
+        - "throttling behavior"
+      references_topics: []
+
+  overall_status: fail
+  summary:
+    total: 8
+    passed: 2
+    partial: 3
+    failed: 3
+    contradictory: 0
+    not_applicable: 0
+    cross_document_findings: 4
+    cross_document_contradictions: 2
+    blocking_findings: 9
+
+  per_document_evaluations:
+    - document: "getting-started.md"
+      overall_status: fail
+      summary:
+        total: 2
+        passed: 1
+        partial: 1
+        failed: 0
+        contradictory: 0
+        not_applicable: 0
+      results:
+        - id: getting-started-first-call-001
+          status: PASS
+          severity: high
+          blocking: true
+          answer_from_document: >
+            getting-started.md provides a base URL and a curl example for a first API call.
+          evidence:
+            - "getting-started.md, sections 'Base URL' and 'First request'"
+          missing_properties: []
+          unsupported_inferences: []
+          risk: ""
+          minimal_fix: ""
+        - id: getting-started-routing-001
+          status: PARTIAL
+          severity: high
+          blocking: true
+          answer_from_document: >
+            getting-started.md mentions authentication and rate limits, but it does not route readers to authentication.md or rate-limits.md as authoritative follow-up docs.
+          evidence:
+            - "getting-started.md, section 'First request'"
+          missing_properties:
+            - "Link to authentication.md for production credential setup"
+            - "Link to rate-limits.md for throttling behavior"
+            - "Statement that those docs are authoritative for their topics"
+          unsupported_inferences:
+            - "Reader must infer that separate reference docs exist."
+          risk: "A reader may finish the quick-start without finding the production setup requirements."
+          minimal_fix: "Add a 'Next steps' section linking to authentication.md and rate-limits.md and naming their authoritative topics."
+      blocking_findings:
+        - "getting-started-routing-001 (PARTIAL, high): missing routing to authoritative follow-up docs"
+      recommended_next_changes:
+        - "Add a 'Next steps' section to getting-started.md."
+
+    - document: "authentication.md"
+      overall_status: fail
+      summary:
+        total: 2
+        passed: 0
+        partial: 1
+        failed: 1
+        contradictory: 0
+        not_applicable: 0
+      results:
+        - id: auth-method-selection-001
+          status: PARTIAL
+          severity: critical
+          blocking: true
+          answer_from_document: >
+            authentication.md describes OAuth2 client credentials and API keys, but it does not recommend which method to use by scenario and does not reconcile 'Bearer token' terminology from the quick start.
+          evidence:
+            - "authentication.md, sections 'OAuth2' and 'API keys'"
+          missing_properties:
+            - "Recommended authentication method by use case"
+            - "Mapping from 'Bearer token' to OAuth2 access token or other mechanism"
+          unsupported_inferences:
+            - "Reader must guess that the Bearer token in getting-started.md is an OAuth2 access token."
+          risk: "Production integrations may choose the wrong authentication method or misunderstand credential type."
+          minimal_fix: "Add 'Choosing an auth method' and map quick-start Bearer-token terminology to the reference terminology."
+        - id: auth-rotation-001
+          status: FAIL
+          severity: critical
+          blocking: true
+          answer_from_document: >
+            authentication.md does not describe API key rotation or OAuth2 client-secret rotation.
+          evidence: []
+          missing_properties:
+            - "API key rotation procedure"
+            - "OAuth2 client-secret rotation procedure"
+            - "Required validation after rotation"
+          unsupported_inferences:
+            - "Reader must invent a credential rotation procedure."
+          risk: "Production credentials may never be rotated or may be rotated unsafely."
+          minimal_fix: "Add credential rotation procedures and post-rotation validation steps."
+      blocking_findings:
+        - "auth-method-selection-001 (PARTIAL, critical): auth recommendation and terminology reconciliation missing"
+        - "auth-rotation-001 (FAIL, critical): rotation procedure missing"
+      recommended_next_changes:
+        - "Add auth method selection guidance and credential rotation procedures."
+
+    - document: "rate-limits.md"
+      overall_status: fail
+      summary:
+        total: 2
+        passed: 0
+        partial: 1
+        failed: 1
+        contradictory: 0
+        not_applicable: 0
+      results:
+        - id: rate-limit-policy-001
+          status: PARTIAL
+          severity: critical
+          blocking: true
+          answer_from_document: >
+            rate-limits.md states that the limit is 60 requests per minute and that 429 is returned when exceeded, but it does not state whether the limit is per-key, per-user, per-tenant, or global.
+          evidence:
+            - "rate-limits.md, sections 'Limits' and 'When the limit is exceeded'"
+          missing_properties:
+            - "Limit scope"
+          unsupported_inferences:
+            - "Reader must guess whether separate API keys share a bucket."
+          risk: "Clients may size traffic incorrectly and cause unexpected throttling."
+          minimal_fix: "State the rate-limit scope explicitly."
+        - id: rate-limit-client-behavior-001
+          status: FAIL
+          severity: critical
+          blocking: true
+          answer_from_document: >
+            rate-limits.md does not describe rate-limit response headers or client backoff behavior.
+          evidence: []
+          missing_properties:
+            - "Rate-limit response headers"
+            - "Meaning of Retry-After or equivalent headers"
+            - "Recommended retry/backoff behavior"
+          unsupported_inferences:
+            - "Reader must invent their own retry behavior."
+          risk: "Clients may hammer the API after 429 responses."
+          minimal_fix: "Add 'Response headers' and 'Recommended client behavior' sections."
+      blocking_findings:
+        - "rate-limit-policy-001 (PARTIAL, critical): limit scope missing"
+        - "rate-limit-client-behavior-001 (FAIL, critical): headers/backoff missing"
+      recommended_next_changes:
+        - "Add rate-limit scope, headers, and retry/backoff guidance."
+
+  set_level_evaluation:
+    summary:
+      total: 2
+      passed: 1
+      partial: 0
+      failed: 1
+      contradictory: 0
+      not_applicable: 0
+      cross_document_findings: 4
+      cross_document_contradictions: 2
+      blocking_findings: 4
+    results:
+      - id: set-routing-001
+        status: FAIL
+        severity: high
+        blocking: true
+        answer_from_document: >
+          The docs do not provide a set-level index or per-document source-of-truth notes that route readers to authoritative docs by topic.
+        evidence: []
+        found_in:
+          - document: "getting-started.md"
+            extent: none
+          - document: "authentication.md"
+            extent: none
+          - document: "rate-limits.md"
+            extent: none
+        expected_in:
+          - "any"
+        missing_properties:
+          - "Topic-to-authoritative-document map"
+          - "Reader routing from quick-start to production references"
+          - "Owner or update path for drift"
+        unsupported_inferences:
+          - "Reader must infer which doc to trust."
+        risk: "Readers act on whichever doc they find first when documents conflict."
+        minimal_fix: "Add source-of-truth notes to each doc or create an index mapping topics to authoritative docs."
+      - id: set-errors-001
+        status: PASS
+        severity: medium
+        blocking: false
+        answer_from_document: >
+          429 behavior is covered in rate-limits.md, but the broader API error catalog is outside this minimal set-level example.
+        evidence:
+          - "rate-limits.md, section 'When the limit is exceeded'"
+        found_in:
+          - document: "rate-limits.md"
+            extent: partial
+            notes: "Covers 429 only."
+        expected_in:
+          - "rate-limits.md"
+        missing_properties: []
+        unsupported_inferences: []
+        risk: ""
+        minimal_fix: ""
+    cross_document_findings:
+      - kind: CONTRADICTION
+        documents_involved:
+          - "getting-started.md"
+          - "rate-limits.md"
+        description: >
+          getting-started.md states the rate limit is 100 requests per minute.
+          rate-limits.md states the limit is 60 requests per minute. A reader
+          following getting-started.md may exceed the true limit by 40 requests
+          per minute.
+        severity: critical
+        blocking: true
+        minimal_fix: >
+          Designate rate-limits.md as authoritative for limit values. Replace the
+          explicit number in getting-started.md with a link to rate-limits.md, or
+          add a callout cross-referencing it.
+      - kind: CONTRADICTION
+        documents_involved:
+          - "getting-started.md"
+          - "authentication.md"
+        description: >
+          getting-started.md instructs readers to authenticate via Bearer token.
+          authentication.md describes OAuth2 and API keys but does not mention
+          Bearer tokens. A reader cannot tell whether Bearer is a third method,
+          a synonym for one of the other two, or out of date.
+        severity: high
+        blocking: true
+        minimal_fix: >
+          Reconcile in authentication.md: state which auth method getting-started.md
+          uses by name, and map "Bearer token" to its underlying mechanism or
+          remove the term from getting-started.md.
+      - kind: MISSING_AUTHORITATIVE_SOURCE
+        documents_involved:
+          - "getting-started.md"
+          - "authentication.md"
+          - "rate-limits.md"
+        description: >
+          No document declares which doc is authoritative for any topic. When
+          documents disagree, readers have no rule for choosing between them.
+        severity: high
+        blocking: true
+        minimal_fix: >
+          Add a source-of-truth note at the top of each document or create an
+          index doc that maps topics to authoritative documents.
+      - kind: ROUTING_GAP
+        documents_involved:
+          - "getting-started.md"
+        description: >
+          getting-started.md does not link forward to authentication.md or
+          rate-limits.md. A reader who finishes the quick-start has no signal
+          about where to go next for production setup.
+        severity: medium
+        blocking: false
+        minimal_fix: >
+          Add a "Next steps" section with links to authentication.md and rate-limits.md.
+    blocking_findings:
+      - "CROSS-DOC: rate limit value contradicted between getting-started.md and rate-limits.md"
+      - "CROSS-DOC: Bearer-token terminology not reconciled with authentication.md"
+      - "CROSS-DOC: no authoritative source map"
+    recommended_next_changes:
+      - "Designate rate-limits.md as authoritative for limit values."
+      - "Reconcile Bearer-token terminology in authentication.md and getting-started.md."
+      - "Add a source-of-truth map or index."
+
+  blocking_findings:
+    - "PER-DOC: getting-started-routing-001 (PARTIAL, high): missing routing to authoritative follow-up docs"
+    - "PER-DOC: auth-method-selection-001 (PARTIAL, critical): auth recommendation and terminology reconciliation missing"
+    - "PER-DOC: auth-rotation-001 (FAIL, critical): rotation procedure missing"
+    - "PER-DOC: rate-limit-policy-001 (PARTIAL, critical): limit scope missing"
+    - "PER-DOC: rate-limit-client-behavior-001 (FAIL, critical): headers/backoff missing"
+    - "SET: set-routing-001 (FAIL, high): no source-of-truth/routing map"
+    - "CROSS-DOC: rate limit value contradicted between getting-started.md and rate-limits.md"
+    - "CROSS-DOC: Bearer-token terminology not reconciled"
+    - "CROSS-DOC: no authoritative source map"
+
+  recommended_next_changes:
+    - "Add source-of-truth notes or an index mapping topics to authoritative docs."
+    - "Replace duplicated rate-limit values in getting-started.md with a link to rate-limits.md."
+    - "Reconcile authentication terminology and add credential rotation procedures."
+    - "Add rate-limit scope, response headers, and backoff behavior."
+    - "Add next-step routing from getting-started.md."
+
+  consolidated_fix_plan:
+    - target: "getting-started.md"
+      kind: per_document
+      reason: "Quick-start does not route readers to authoritative production setup docs."
+      fix: "Add a 'Next steps' section linking to authentication.md and rate-limits.md."
+    - target: "authentication.md"
+      kind: per_document
+      reason: "Credential rotation and auth method selection are missing."
+      fix: "Add method-selection and rotation sections; reconcile Bearer-token terminology."
+    - target: "rate-limits.md"
+      kind: per_document
+      reason: "Rate-limit scope, headers, and backoff guidance are missing."
+      fix: "Add scope, response-header, and client-backoff sections."
+    - target: "getting-started.md + rate-limits.md"
+      kind: cross_document
+      reason: "Rate-limit values conflict."
+      fix: "Make rate-limits.md authoritative and remove duplicated literal limits from getting-started.md."
+    - target: "docs-index.md"
+      kind: set_level
+      reason: "No document declares topic ownership or precedence."
+      fix: "Create an index or source-of-truth map for the documentation set."

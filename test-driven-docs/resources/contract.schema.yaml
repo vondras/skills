@@ -1,0 +1,91 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Acceptance-Test-Driven Documentation Contract"
+type: object
+required:
+  - document_contract
+properties:
+  document_contract:
+    type: object
+    required:
+      - title
+      - audience
+      - purpose
+      - non_goals
+      - expected_reader_actions
+      - source_of_truth_boundary
+      - freshness_expectation
+      - success_criteria
+    additionalProperties: false
+    properties:
+      title:
+        type: string
+        minLength: 1
+      audience:
+        type: object
+        required:
+          - primary
+        additionalProperties: false
+        properties:
+          primary:
+            type: array
+            minItems: 1
+            items:
+              type: string
+              minLength: 1
+          secondary:
+            type: array
+            items:
+              type: string
+              minLength: 1
+      purpose:
+        type: string
+        minLength: 1
+      non_goals:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      expected_reader_actions:
+        type: array
+        minItems: 1
+        items:
+          type: string
+          minLength: 1
+      source_of_truth_boundary:
+        type: string
+        minLength: 1
+      freshness_expectation:
+        type: string
+        minLength: 1
+      success_criteria:
+        type: array
+        minItems: 1
+        items:
+          type: string
+          minLength: 1
+      owners:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      related_sources_of_truth:
+        type: array
+        items:
+          type: object
+          required:
+            - name
+            - precedence
+          additionalProperties: false
+          properties:
+            name:
+              type: string
+              minLength: 1
+            precedence:
+              type: string
+              minLength: 1
+            notes:
+              type: string
+      risk_classes:
+        type: object
+        additionalProperties:
+          type: string

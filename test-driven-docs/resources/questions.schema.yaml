@@ -1,0 +1,112 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+title: "Documentation Acceptance Question Suite"
+type: object
+required:
+  - document_tests
+additionalProperties: false
+properties:
+  document_tests:
+    type: object
+    required:
+      - tests
+    oneOf:
+      - required: ["document"]
+        not:
+          required: ["document_set"]
+      - required: ["document_set"]
+        not:
+          required: ["document"]
+    additionalProperties: false
+    properties:
+      document:
+        description: "Single document under evaluation. Mutually exclusive with document_set."
+        type: string
+        minLength: 1
+      document_set:
+        description: "Document set under audit. Mutually exclusive with document."
+        type: array
+        minItems: 2
+        items:
+          type: string
+          minLength: 1
+      audience:
+        type: array
+        items:
+          type: string
+          minLength: 1
+      coverage_model:
+        type: array
+        items:
+          type: object
+          required:
+            - category
+            - purpose
+          additionalProperties: false
+          properties:
+            category:
+              type: string
+              minLength: 1
+            purpose:
+              type: string
+              minLength: 1
+      tests:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          required:
+            - id
+            - category
+            - severity
+            - reader_role
+            - question
+            - expected_answer_properties
+            - failure_risk
+            - blocking
+          additionalProperties: false
+          properties:
+            id:
+              type: string
+              pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*-[0-9]{3}$"
+            category:
+              type: string
+              minLength: 1
+            severity:
+              type: string
+              enum: [critical, high, medium, low]
+            reader_role:
+              type: string
+              minLength: 1
+            question:
+              type: string
+              minLength: 1
+            expected_answer_properties:
+              type: array
+              minItems: 1
+              items:
+                type: string
+                minLength: 1
+            failure_risk:
+              type: string
+              minLength: 1
+            blocking:
+              type: boolean
+            notes:
+              type: string
+            expected_documents:
+              description: "For document-set audits. Names the document(s) where the answer is expected to live."
+              type: array
+              minItems: 1
+              items:
+                type: string
+                minLength: 1
+            acceptable_documents:
+              description: "For document-set audits. 'any' if the answer may live anywhere, or a list of acceptable documents."
+              oneOf:
+                - type: string
+                  enum: [any]
+                - type: array
+                  minItems: 1
+                  items:
+                    type: string
+                    minLength: 1
