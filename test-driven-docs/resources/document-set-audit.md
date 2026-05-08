@@ -93,20 +93,42 @@ For each document:
 
 ### 3. Build the set-level test suite
 
-Set-level tests should cover:
+Derive candidate set-level tests using the following procedure. Do not start from a blank rubric; generate questions from the inputs already produced in Step 1.
 
-- discoverability: using only document names, titles, and opening purpose statements, can a reader new to the set identify which document to consult for a given task — without a separate index or prior knowledge of the layout?
-- reader routing: do documents contain explicit cross-references and routing signals that guide readers once they are in the right place?
-- manifest consistency: do frontmatter IDs, document-set membership, related-doc links, and referenced artifacts line up?
-- source-of-truth boundaries: which doc/system is authoritative for each topic?
-- cross-document contradictions: factual or procedural disagreements
-- duplication and drift risk: same fact repeated in multiple places
-- terminology consistency: same concept named consistently
-- coverage gaps: no document owns a required question
-- stale references: links, version names, ownership, dates, process names
-- escalation and ownership across the set
+**Step 3a — Establish derivation inputs**
 
-Each set-level test should declare `expected_documents` or `acceptable_documents: any`.
+Collect from the Step 1 inventory:
+
+- The combined declared audience across all documents in the set.
+- The authoritative-topic map: for each topic declared or apparent, which document owns it?
+- The routing map: which documents refer to which others, and for what purpose?
+- Undeclared but apparent topics that no document claims.
+
+**Step 3b — Generate per-category candidate tests**
+
+For each standard Layer-2 category, derive at least one candidate test from the Step 3a inputs:
+
+- **discoverability** — using only document names, titles, and opening purpose statements, can a reader new to the set identify which document to consult for a given task — without a separate index or prior knowledge of the layout?
+- **reader routing** — do documents contain explicit cross-references and routing signals that guide readers once they are in the right place?
+- **manifest consistency** — do frontmatter IDs, document-set membership, related-doc links, and referenced artifacts line up?
+- **source-of-truth boundaries** — which doc/system is authoritative for each topic? Are there topics on the authoritative-topic map with no declared owner?
+- **cross-document contradictions** — do any documents assert conflicting factual or procedural claims?
+- **duplication and drift risk** — is the same fact repeated in multiple places?
+- **terminology consistency** — is the same concept named consistently across the set?
+- **coverage gaps** — does the combined audience require any reader questions that no test currently asserts? For each gap, identify which document should own the answer.
+- **stale references** — links, version names, ownership, dates, process names
+- **escalation and ownership** — can a reader determine who to escalate to for each topic area?
+
+**Step 3c — Add audience-specific candidate tests**
+
+For each declared audience segment across the set, generate at least one reader-journey question: starting from their entry point, can they complete their primary task using only the documents, explicit routing signals, and authoritative claims?
+
+**Step 3d — Classify severity and surface for review**
+
+- Classify each candidate test using `resources/severity-calibration.md`.
+- Surface candidate tests under fix-plan category **suite_expansion** for operator review before running set-level evaluation.
+
+Each finalized set-level test should declare `expected_documents` or `acceptable_documents: any`.
 
 ### 4. Run set-level evaluation
 

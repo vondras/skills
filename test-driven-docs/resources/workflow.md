@@ -154,6 +154,29 @@ Each material question becomes a test with expected answer properties.
 
 A test is good when an evaluator can distinguish complete, partial, missing, contradictory, and inferred answers.
 
+## Suite expansion
+
+When a suite is loaded (supplied by the operator, referenced via frontmatter, or just derived), run a suite expansion pass before evaluation. The goal is to ensure the audit tests the document as thoroughly as the document's own content and context demand — not merely as thoroughly as the existing suite asks.
+
+### Per-document expansion
+
+1. **Surface untested content** — compare the document's sections, topics, and procedures against the loaded tests; flag any content block with no corresponding test as a *suite under-coverage finding*.
+2. **Derive candidate per-document tests** — using the document's `audience`, `purpose`, `authoritative_for`, existing test categories, and body, generate logically-implied questions not already in the suite. Examples: a rollback procedure with no smoke-test question, an auth document covering rotation with no revocation question, a workflow document that gained a phase without a corresponding test.
+
+### Set-level expansion
+
+3. **Derive candidate set-level tests** — using the set's combined audience, the inventory of authoritative topics per document, and the standard Layer-2 categories (discoverability, routing, manifest consistency, source of truth, terminology, escalation, ownership), generate reader-journey questions the set's audience requires that no current test asserts.
+
+### Handling candidates
+
+In all three cases:
+
+- Classify candidate-test severity using `resources/severity-calibration.md`.
+- Surface candidates for operator review rather than silently appending them to the suite.
+- Emit findings under fix-plan category **suite_expansion** — distinct from *per-document fixes* (correct a document's content) and *set-level fixes* (fix routing, structure, or ownership).
+
+Suite expansion runs after suite load and before evaluation. It shapes what evaluation will examine.
+
 ## Phase 4 — Author or revise the document
 
 Use the contract and test suite as acceptance criteria. The final document should answer tests naturally through coherent structure, not by appending a large FAQ.
