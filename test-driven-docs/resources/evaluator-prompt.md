@@ -3,6 +3,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-evaluator-prompt
+  document_set: test-driven-docs-skill-docset
+  role_in_set: reference
   title: Documentation Completeness Evaluator
   audience:
     primary:
@@ -46,6 +48,10 @@ tddoc:
       relationship: used_by
     - path: ./severity-calibration.md
       relationship: elaborated_by
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./evaluator-prompt.questions.yaml
 ---
@@ -219,6 +225,7 @@ Return `fail` if any of the following are true:
 - any blocking contradiction exists in a single document
 - any blocking cross-document contradiction exists
 - no document is authoritative for a critical/high reader action
+- frontmatter declares conflicting authority or stale/missing artifact references that affect critical/high tests
 
 Return `pass_with_warnings` if all blocking critical/high tests pass but medium/low tests have gaps.
 

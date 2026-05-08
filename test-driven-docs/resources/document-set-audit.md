@@ -3,6 +3,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-document-set-audit
+  document_set: test-driven-docs-skill-docset
+  role_in_set: reference
   title: Mode F — Document-Set Audit
   audience:
     primary:
@@ -42,6 +44,12 @@ tddoc:
       relationship: extends
     - path: ./evaluator-prompt.md
       relationship: uses
+    - path: ./frontmatter-manifest.md
+      relationship: uses
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./document-set-audit.questions.yaml
 ---
