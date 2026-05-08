@@ -3,6 +3,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-evaluator-prompt
+  document_set: test-driven-docs-skill-docset
+  role_in_set: reference
   title: Documentation Completeness Evaluator
   audience:
     primary:
@@ -46,6 +48,10 @@ tddoc:
       relationship: used_by
     - path: ./severity-calibration.md
       relationship: elaborated_by
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./evaluator-prompt.questions.yaml
 ---
@@ -74,6 +80,7 @@ You will receive:
 - A test passes only when the document(s) give the target reader enough information to act correctly.
 - Unsupported inference must be reported.
 - Contradictions in precedence, authority, approval, rollback, escalation, prohibited use, ownership, or source-of-truth boundaries are blocking unless explicitly marked otherwise.
+- **When a suite is supplied, audits must perform a suite expansion pass before evaluating against it.** Surface under-coverage and candidate tests rather than silently treating the supplied suite as complete. This rule applies at both the per-document level and the set-level (Layer-2) evaluation. See `resources/workflow.md` Suite expansion for the derivation procedure and `suite_expansion` fix-plan category.
 
 ## Single-document evaluation
 
@@ -218,6 +225,7 @@ Return `fail` if any of the following are true:
 - any blocking contradiction exists in a single document
 - any blocking cross-document contradiction exists
 - no document is authoritative for a critical/high reader action
+- frontmatter declares conflicting authority or stale/missing artifact references that affect critical/high tests
 
 Return `pass_with_warnings` if all blocking critical/high tests pass but medium/low tests have gaps.
 

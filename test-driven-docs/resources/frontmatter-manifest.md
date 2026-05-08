@@ -3,6 +3,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-frontmatter-manifest
+  document_set: test-driven-docs-skill-docset
+  role_in_set: reference
   title: Test-Driven-Docs Frontmatter Manifest
   audience:
     primary:
@@ -43,6 +45,10 @@ tddoc:
       relationship: entry_point_for
     - path: ./workflow.md
       relationship: used_by
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./frontmatter-manifest.questions.yaml
 ---
@@ -59,6 +65,29 @@ The machine-readable schema for all frontmatter fields and allowed values is `re
 - External question-suite files are authoritative for full documentation tests when referenced by frontmatter.
 - External evaluation files are generated evidence and are never authoritative over the document, manifest, or test suite.
 - Inline tests are allowed only for small documents where the test suite remains readable.
+
+## Required and optional fields
+
+The schema (`resources/tddoc.frontmatter.schema.yaml`) is the authoritative source for field constraints. The following summary helps document authors know what is mandatory before opening the schema.
+
+**Required:**
+- `version` — schema version (currently `1`)
+- `artifact_type` — always `document` for prose documents
+- `id` — unique stable identifier for this document
+- `title` — human-readable document title
+- `audience.primary` — list of at least one primary reader role
+- `purpose` — one- or two-sentence statement of why the document exists
+- `source_of_truth` — declares this document's authority and precedence boundaries
+
+**Optional (include when relevant):**
+- `non_goals` — explicit out-of-scope items
+- `expected_reader_actions` — what the reader should be able to do after reading
+- `authoritative_for` — list of topics this document owns
+- `related_documents` — links to related docs with relationship types
+- `document_set` / `role_in_set` — set membership and role for Mode F
+- `freshness` — review cadence, owner, and last-reviewed date
+- `tests` / `tests_inline` — test suite pointer or inline tests (mutually exclusive)
+- `evaluation` — evaluation stamp for CI and reviewer visibility
 
 ## Precedence
 
@@ -143,6 +172,7 @@ tddoc:
     latest: ./s3-to-snowflake-ingestion.eval.yaml
     status: pass_with_warnings
     evaluated_at: 2026-05-07
+    evaluator: test-driven-docs
     document_hash: sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
 ---
 ```

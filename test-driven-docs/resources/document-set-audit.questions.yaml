@@ -79,3 +79,39 @@ document_tests:
         - consolidated_fix_plan
       failure_risk: "Operator omits required fields and the output cannot be validated by the schema."
       blocking: false
+
+    - id: dsa-suite-expansion-step2-001
+      category: execution
+      severity: critical
+      reader_role: skill operator
+      question: "What additional activity must be performed during Step 2 (per-document evaluation) that goes beyond running the standard evaluation?"
+      expected_answer_properties:
+        - names the suite expansion pass
+        - states it must be run before evaluating each document
+        - references resources/workflow.md Suite expansion section for the procedure
+        - states candidates are emitted under suite_expansion fix-plan category
+      failure_risk: "Operator runs per-document evaluation without a suite expansion pass, missing untested content sections and logically-implied candidate tests."
+      blocking: true
+
+    - id: dsa-suite-expansion-step3-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "What four sub-steps make up the set-level test suite derivation procedure in Step 3?"
+      expected_answer_properties:
+        - step 3a establish derivation inputs from the inventory (combined audience, authoritative-topic map, routing map, undeclared topics)
+        - step 3b generate per-category candidate tests for each Layer-2 category
+        - step 3c add audience-specific reader-journey candidate tests
+        - step 3d classify severity using severity-calibration.md and surface candidates under suite_expansion for operator review
+      failure_risk: "Operator builds set-level tests from a blank rubric, missing coverage implied by the document set's own inventory."
+      blocking: true
+
+    - id: dsa-gate-stale-frontmatter-001
+      category: decisions
+      severity: high
+      reader_role: skill operator
+      question: "Beyond the four common fail conditions, what frontmatter-related condition also causes Mode F to return fail?"
+      expected_answer_properties:
+        - frontmatter declares conflicting authority OR stale/missing artifact references that affect critical/high tests
+      failure_risk: "Operator returns pass_with_warnings when stale frontmatter artifact references are silently degrading the audit quality."
+      blocking: true

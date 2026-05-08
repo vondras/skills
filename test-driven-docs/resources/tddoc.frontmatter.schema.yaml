@@ -31,7 +31,17 @@ properties:
         minLength: 1
       role_in_set:
         type: string
-        minLength: 1
+        enum:
+          - entry_point
+          - reference
+          - runbook
+          - policy
+          - tutorial
+          - deep_dive
+          - ADR
+          - glossary
+          - index
+          - operational_runbook
       document_set:
         type: string
         minLength: 1

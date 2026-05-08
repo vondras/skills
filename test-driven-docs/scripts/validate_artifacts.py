@@ -187,6 +187,38 @@ def validate_evaluation_counts(path: Path) -> list[str]:
     return errors
 
 
+def check_bidirectional_related_documents(root: Path) -> list[str]:
+    """Warn when document A lists document B but B has no link back to A."""
+    # Build a map: absolute_path -> list of absolute paths it links to
+    links: dict[Path, list[Path]] = {}
+    for path in sorted(root.rglob("*.md")):
+        if path.name == "authoring-template.md":
+            continue
+        frontmatter, _ = parse_markdown_frontmatter(path)
+        if not frontmatter or "tddoc" not in frontmatter:
+            continue
+        tddoc = frontmatter.get("tddoc") or {}
+        targets = []
+        for related in tddoc.get("related_documents") or []:
+            rel_path = related.get("path")
+            if rel_path:
+                target = (path.parent / rel_path).resolve()
+                if target.exists():
+                    targets.append(target)
+        links[path.resolve()] = targets
+
+    warnings = []
+    for src, targets in links.items():
+        for tgt in targets:
+            if tgt not in links:
+                continue  # target has no tddoc frontmatter, skip
+            if src not in links[tgt]:
+                warnings.append(
+                    f"WARN: {src.relative_to(root)}: lists {tgt.relative_to(root)} in related_documents but no reciprocal link found"
+                )
+    return warnings
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
@@ -237,6 +269,9 @@ def main() -> int:
     for path in [examples / "example.evaluation.yaml", examples / "example.docset.evaluation.yaml"]:
         if path.exists():
             errors.extend(validate_evaluation_counts(path))
+
+    for warning in check_bidirectional_related_documents(root):
+        print(warning, file=sys.stderr)
 
     if errors:
         for error in errors:

@@ -3,6 +3,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-severity-calibration
+  document_set: test-driven-docs-skill-docset
+  role_in_set: reference
   title: Severity Calibration
   audience:
     primary:
@@ -35,6 +37,10 @@ tddoc:
       relationship: used_by
     - path: ../SKILL.md
       relationship: entry_point_for
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./severity-calibration.questions.yaml
 ---

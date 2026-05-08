@@ -5,6 +5,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-skill
+  document_set: test-driven-docs-skill-docset
+  role_in_set: entry_point
   title: Test-Driven Documentation Skill
   audience:
     primary:
@@ -44,6 +46,10 @@ tddoc:
       relationship: elaborated_by
     - path: ./resources/frontmatter-manifest.md
       relationship: elaborated_by
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./resources/skill.questions.yaml
 ---

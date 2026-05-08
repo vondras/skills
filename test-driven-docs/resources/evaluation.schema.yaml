@@ -158,7 +158,7 @@ properties:
               minLength: 1
             kind:
               type: string
-              enum: [per_document, cross_document, set_level]
+              enum: [per_document, cross_document, set_level, suite_expansion]
             reason:
               type: string
               minLength: 1

@@ -74,3 +74,17 @@ document_tests:
         - set-level results include found_in and expected_in fields
       failure_risk: "Evaluator collapses the set into one corpus and grants cross-document credit, producing false passes."
       blocking: true
+
+    - id: eval-suite-expansion-001
+      category: governance
+      severity: critical
+      reader_role: evaluator
+      question: "When a test suite is supplied, what additional pass must the evaluator run before evaluating against it, and at what scope does this rule apply?"
+      expected_answer_properties:
+        - names the suite expansion pass
+        - states it applies at both per-document and set-level (Layer-2) evaluation
+        - states that under-coverage and candidate tests must be surfaced, not silently skipped
+        - references resources/workflow.md Suite expansion for the derivation procedure
+        - states candidates are emitted under suite_expansion fix-plan category
+      failure_risk: "Evaluator treats the supplied suite as complete, missing untested content and logically-implied gaps."
+      blocking: true

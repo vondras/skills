@@ -61,3 +61,29 @@ document_tests:
         - states the condition under which everything-at-once is acceptable
       failure_risk: "Operator dumps all artifacts in one response for a complex document, overwhelming the user."
       blocking: false
+
+    - id: workflow-suite-expansion-001
+      category: execution
+      severity: critical
+      reader_role: skill operator
+      question: "Before evaluating against a loaded suite, what pass must be run first, and what are its three activities?"
+      expected_answer_properties:
+        - names the suite expansion pass
+        - activity 1 surface untested content blocks (sections or topics with no corresponding test)
+        - activity 2 derive per-document candidate tests from audience, purpose, authoritative_for, existing categories, and body
+        - activity 3 derive set-level candidate tests from combined audience, authoritative-topic map, and Layer-2 categories
+        - states the pass runs after suite load and before evaluation
+      failure_risk: "Operator evaluates against a supplied suite without checking whether the suite itself is complete, missing per-document gaps and set-level coverage holes."
+      blocking: true
+
+    - id: workflow-suite-expansion-002
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "Under what fix-plan category must suite expansion candidates be emitted, and how does it differ from per_document and set_level fix kinds?"
+      expected_answer_properties:
+        - names suite_expansion as the fix-plan category
+        - distinguishes suite_expansion (candidate tests for operator review) from per_document (fix document content) and set_level (fix routing, structure, or ownership)
+        - states that candidates are surfaced for operator review rather than silently appended
+      failure_risk: "Operator conflates candidate test findings with content fixes, producing an unactionable fix plan."
+      blocking: true

@@ -3,6 +3,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-workflow
+  document_set: test-driven-docs-skill-docset
+  role_in_set: reference
   title: Test-Driven Documentation Workflow
   audience:
     primary:
@@ -42,6 +44,10 @@ tddoc:
       relationship: elaborated_by
     - path: ./frontmatter-manifest.md
       relationship: elaborated_by
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./workflow.questions.yaml
 ---
@@ -86,7 +92,7 @@ When metadata drift is detected: report the finding, fall back to deriving a min
 
 ## Phase 1 — Document contract
 
-Before drafting, establish a contract. If the document already has test-driven-docs frontmatter, use it as the starting contract manifest and check it for gaps or drift. If the user supplied enough context, infer a reasonable first version and label assumptions. If not, ask only the questions needed to avoid wasted work.
+Before drafting, establish a contract. If the document already has test-driven-docs frontmatter, use it as the starting contract manifest and check it for gaps or drift. Load the referenced `tests.suite` as the starting test suite — do not re-derive from scratch — but still run the suite expansion pass (see Suite expansion below) to surface any coverage gaps or logically-implied tests the suite may be missing. Do not treat any `evaluation.status` stamp in frontmatter as proof the document currently passes; evaluation stamps are attestations of a prior run only. If the user supplied enough context, infer a reasonable first version and label assumptions. If not, ask only the questions needed to avoid wasted work.
 
 Minimum contract:
 
@@ -153,6 +159,29 @@ Each material question becomes a test with expected answer properties.
 ```
 
 A test is good when an evaluator can distinguish complete, partial, missing, contradictory, and inferred answers.
+
+## Suite expansion
+
+When a suite is loaded (supplied by the operator, referenced via frontmatter, or just derived), run a suite expansion pass before evaluation. The goal is to ensure the audit tests the document as thoroughly as the document's own content and context demand — not merely as thoroughly as the existing suite asks.
+
+### Per-document expansion
+
+1. **Surface untested content** — compare the document's sections, topics, and procedures against the loaded tests; flag any content block with no corresponding test as a *suite under-coverage finding*.
+2. **Derive candidate per-document tests** — using the document's `audience`, `purpose`, `authoritative_for`, existing test categories, and body, generate logically-implied questions not already in the suite. Examples: a rollback procedure with no smoke-test question, an auth document covering rotation with no revocation question, a workflow document that gained a phase without a corresponding test.
+
+### Set-level expansion
+
+3. **Derive candidate set-level tests** — using the set's combined audience, the inventory of authoritative topics per document, and the standard Layer-2 categories (discoverability, routing, manifest consistency, source of truth, terminology, escalation, ownership), generate reader-journey questions the set's audience requires that no current test asserts.
+
+### Handling candidates
+
+For all three expansion types (per-document untested content, per-document logically-implied questions, set-level reader-journey questions):
+
+- Classify candidate-test severity using `resources/severity-calibration.md`.
+- Surface candidates for operator review rather than silently appending them to the suite.
+- Emit findings under fix-plan category **suite_expansion** — distinct from *per-document fixes* (correct a document's content) and *set-level fixes* (fix routing, structure, or ownership).
+
+Suite expansion runs after suite load and before evaluation. It shapes what evaluation will examine.
 
 ## Phase 4 — Author or revise the document
 
@@ -269,6 +298,8 @@ Output the document, and include a short coverage note only when useful.
 Use when the user supplies a single document and wants gap analysis.
 
 If the user supplies a test suite, evaluate against it. If the document frontmatter references a test suite or contains `tests_inline`, use that before deriving tests. If the user supplies only a document with no usable tests, derive a default test suite from the document type and apparent audience. Surface the derived suite before evaluation or label each test with "derived because ..." so the user can challenge the rubric.
+
+Regardless of how the suite was obtained, run the **Suite expansion** pass (see Suite expansion section above) before evaluating: surface untested content and candidate tests, emit them under fix-plan category **suite_expansion**, then proceed to evaluation.
 
 Output:
 

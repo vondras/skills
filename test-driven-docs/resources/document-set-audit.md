@@ -3,6 +3,8 @@ tddoc:
   version: 1
   artifact_type: document
   id: test-driven-docs-document-set-audit
+  document_set: test-driven-docs-skill-docset
+  role_in_set: reference
   title: Mode F — Document-Set Audit
   audience:
     primary:
@@ -42,6 +44,12 @@ tddoc:
       relationship: extends
     - path: ./evaluator-prompt.md
       relationship: uses
+    - path: ./frontmatter-manifest.md
+      relationship: uses
+  freshness:
+    owner: skill-maintainer
+    expectation: Review on each skill version bump or when referenced resources change.
+    last_reviewed: "2026-05-08"
   tests:
     suite: ./document-set-audit.questions.yaml
 ---
@@ -88,25 +96,48 @@ For each document:
 - If the document has test-driven-docs frontmatter, use referenced `tests.suite` or `tests_inline` before deriving tests.
 - If no tests exist, derive a minimal suite from frontmatter, title, purpose, apparent audience, headings, and role in the set.
 - Label derived tests as derived.
+- **Run the suite expansion pass** (see `resources/workflow.md` Suite expansion) before evaluating: surface untested content sections and derive per-document candidate tests implied by the document's audience, purpose, authoritative_for, and body. Emit candidates under fix-plan category **suite_expansion**.
 - Evaluate using the same evidence rules as Mode D/E.
 - Do not give credit for information in another document unless this document clearly routes to that other document as authoritative for the question.
 
 ### 3. Build the set-level test suite
 
-Set-level tests should cover:
+Derive candidate set-level tests using the following procedure. Do not start from a blank rubric; generate questions from the inputs already produced in Step 1.
 
-- discoverability: using only document names, titles, and opening purpose statements, can a reader new to the set identify which document to consult for a given task — without a separate index or prior knowledge of the layout?
-- reader routing: do documents contain explicit cross-references and routing signals that guide readers once they are in the right place?
-- manifest consistency: do frontmatter IDs, document-set membership, related-doc links, and referenced artifacts line up?
-- source-of-truth boundaries: which doc/system is authoritative for each topic?
-- cross-document contradictions: factual or procedural disagreements
-- duplication and drift risk: same fact repeated in multiple places
-- terminology consistency: same concept named consistently
-- coverage gaps: no document owns a required question
-- stale references: links, version names, ownership, dates, process names
-- escalation and ownership across the set
+**Step 3a — Establish derivation inputs**
 
-Each set-level test should declare `expected_documents` or `acceptable_documents: any`.
+Collect from the Step 1 inventory:
+
+- The combined declared audience across all documents in the set.
+- The authoritative-topic map: for each topic declared or apparent, which document owns it?
+- The routing map: which documents refer to which others, and for what purpose?
+- Undeclared but apparent topics that no document claims.
+
+**Step 3b — Generate per-category candidate tests**
+
+For each standard Layer-2 category, derive at least one candidate test from the Step 3a inputs:
+
+- **discoverability** — using only document names, titles, and opening purpose statements, can a reader new to the set identify which document to consult for a given task — without a separate index or prior knowledge of the layout?
+- **reader routing** — do documents contain explicit cross-references and routing signals that guide readers once they are in the right place?
+- **manifest consistency** — do frontmatter IDs, document-set membership, related-doc links, and referenced artifacts line up?
+- **source-of-truth boundaries** — which doc/system is authoritative for each topic? Are there topics on the authoritative-topic map with no declared owner?
+- **cross-document contradictions** — do any documents assert conflicting factual or procedural claims?
+- **duplication and drift risk** — is the same fact repeated in multiple places?
+- **terminology consistency** — is the same concept named consistently across the set?
+- **coverage gaps** — does the combined audience require any reader questions that no test currently asserts? For each gap, identify which document should own the answer.
+- **stale references** — links, version names, ownership, dates, process names
+- **escalation and ownership** — can a reader determine who to escalate to for each topic area?
+
+**Step 3c — Add audience-specific candidate tests**
+
+For each declared audience segment across the set, generate at least one reader-journey question: starting from their entry point, can they complete their primary task using only the documents, explicit routing signals, and authoritative claims?
+
+**Step 3d — Classify severity and surface for review**
+
+- Classify each candidate test using `resources/severity-calibration.md`.
+- Surface candidate tests under fix-plan category **suite_expansion** for operator review before running set-level evaluation.
+
+Each finalized set-level test should declare `expected_documents` or `acceptable_documents: any`.
 
 ### 4. Run set-level evaluation
 
@@ -122,6 +153,7 @@ A set-level test passes only if the reader can reasonably find the right documen
 
 Separate fixes into:
 
+- **suite_expansion** — candidate tests surfaced during the expansion pass (per-document or set-level) that the operator should add to the suite or consciously discard; distinct from content fixes
 - **per-document fixes** — a specific doc is incomplete or ambiguous
 - **cross-document fixes** — contradictions, duplicated facts, terminology drift, or precedence conflicts
 - **set-level fixes** — missing doc, missing ownership model, or source-of-truth map; for discoverability failures, prefer renaming a document, improving its title or purpose statement, or adding targeted cross-references over creating a new routing or index document
@@ -174,6 +206,10 @@ evaluation:
     cross_document_findings: []
 
   consolidated_fix_plan:
+    - target: "doc-a.md"
+      kind: suite_expansion
+      reason: "Rollback section has no test exercising trigger conditions or success validation."
+      fix: "Add test: 'Under what conditions may rollback be initiated, and how is success validated?'"
     - target: "doc-a.md"
       kind: per_document
       reason: "Local rollback guidance missing."
