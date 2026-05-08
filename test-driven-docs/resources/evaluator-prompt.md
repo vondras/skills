@@ -82,18 +82,35 @@ You will receive:
 - Contradictions in precedence, authority, approval, rollback, escalation, prohibited use, ownership, or source-of-truth boundaries are blocking unless explicitly marked otherwise.
 - **When a suite is supplied, audits must perform a suite expansion pass before evaluating against it.** Surface under-coverage and candidate tests rather than silently treating the supplied suite as complete. This rule applies at both the per-document level and the set-level (Layer-2) evaluation. See `resources/workflow.md` Suite expansion for the derivation procedure and `suite_expansion` fix-plan category.
 
-## Single-document evaluation
+## Two-phase evaluation model
 
-For each test:
+Evaluate each test in two phases.
+
+### Phase 1 — Evaluator reading pass (no rubric exposure)
+
+During the initial read, the evaluator must use only:
+
+- `question`
+- `reader_role`
+- the supplied document(s) and frontmatter metadata
+
+During this phase, do **not** expose or use `expected_answer_properties` or `failure_risk`. These are grading-rubric fields and must not guide the initial reading pass.
+
+For each test in Phase 1:
 
 1. Answer the question using only the document.
 2. Identify exact supporting section, heading, table, or excerpt.
-3. Mark status as PASS, PARTIAL, FAIL, CONTRADICTORY, or NOT_APPLICABLE.
-4. Compare the answer to every expected answer property.
-5. List missing properties.
-6. Identify unsupported assumptions or inferences.
-7. Explain the risk created by the gap.
-8. Propose the minimal documentation change needed.
+3. Identify what is missing, vague, or contradictory for the target reader.
+4. Flag unsupported assumptions or inferences.
+
+### Phase 2 — Grading pass (rubric application)
+
+After the initial reading pass is complete, grade the Phase-1 result against the test rubric:
+
+- Compare the answer to every `expected_answer_properties` item.
+- Use `failure_risk` to calibrate severity and risk framing.
+- Assign status as PASS, PARTIAL, FAIL, CONTRADICTORY, or NOT_APPLICABLE.
+- Populate `missing_properties`, `unsupported_inferences`, `risk`, and `minimal_fix`.
 
 ## Document-set audits
 

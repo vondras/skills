@@ -97,7 +97,7 @@ For each document:
 - If no tests exist, derive a minimal suite from frontmatter, title, purpose, apparent audience, headings, and role in the set.
 - Label derived tests as derived.
 - **Run the suite expansion pass** (see `resources/workflow.md` Suite expansion) before evaluating: surface untested content sections and derive per-document candidate tests implied by the document's audience, purpose, authoritative_for, and body. Emit candidates under fix-plan category **suite_expansion**.
-- Evaluate using the same evidence rules as Mode D/E.
+- Evaluate using the same evidence rules as Mode D/E, with the same two-phase model: Phase 1 evaluator read without rubric exposure; Phase 2 grading pass applies `expected_answer_properties` and `failure_risk`.
 - Do not give credit for information in another document unless this document clearly routes to that other document as authoritative for the question.
 
 ### 3. Build the set-level test suite
@@ -141,7 +141,7 @@ Each finalized set-level test should declare `expected_documents` or `acceptable
 
 ### 4. Run set-level evaluation
 
-Evaluate the full corpus for the set-level tests. Record:
+Evaluate the full corpus for the set-level tests using the same two-phase model (read pass first, rubric grading second). Record:
 
 - `found_in`: which docs answer the test, and to what extent
 - `expected_in`: which docs were expected to answer it

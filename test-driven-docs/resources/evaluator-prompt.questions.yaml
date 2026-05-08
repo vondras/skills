@@ -88,3 +88,16 @@ document_tests:
         - states candidates are emitted under suite_expansion fix-plan category
       failure_risk: "Evaluator treats the supplied suite as complete, missing untested content and logically-implied gaps."
       blocking: true
+    - id: workflow-007
+      category: execution
+      severity: high
+      reader_role: evaluator
+      question: "Does the evaluator prompt require a two-phase flow where the initial reading pass uses only question plus reader_role and does not expose expected_answer_properties or failure_risk until grading?"
+      expected_answer_properties:
+        - defines a two-phase model
+        - states the initial reading pass uses question and reader_role
+        - explicitly says expected_answer_properties is grading-only
+        - explicitly says failure_risk is grading-only
+      failure_risk: "Evaluator gets primed by rubric fields and returns biased false passes or suppressed independent risk findings."
+      blocking: true
+
