@@ -223,7 +223,14 @@ Use only the sections that fit the artifact.
 
 Evaluate using only the supplied document(s). Do not rely on outside knowledge, common sense, or prior author intent.
 
-For each test, produce:
+Use a two-phase flow:
+
+1. **Phase 1 — Evaluator reading pass**: use only `question` and `reader_role` (plus document/frontmatter evidence) to produce an answer, evidence, and identified gaps/ambiguities.
+2. **Phase 2 — Grading pass**: apply `expected_answer_properties` and `failure_risk` to assign status and complete grading fields.
+
+Do not expose or use `expected_answer_properties` or `failure_risk` during Phase 1.
+
+For each test result, produce:
 
 - status: PASS, PARTIAL, FAIL, CONTRADICTORY, or NOT_APPLICABLE
 - answer found in the document(s)

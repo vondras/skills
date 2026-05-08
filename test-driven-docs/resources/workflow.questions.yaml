@@ -87,3 +87,16 @@ document_tests:
         - states that candidates are surfaced for operator review rather than silently appended
       failure_risk: "Operator conflates candidate test findings with content fixes, producing an unactionable fix plan."
       blocking: true
+
+
+    - id: workflow-eval-two-phase-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "How must Phase 5 separate evaluator reading from rubric grading?"
+      expected_answer_properties:
+        - defines a Phase 1 reading pass using only question and reader_role with document evidence
+        - prohibits exposing expected_answer_properties and failure_risk during Phase 1
+        - defines a Phase 2 grading pass that applies expected_answer_properties and failure_risk
+      failure_risk: "Operator primes evaluation with rubric hints, creating biased scoring and weaker gap detection."
+      blocking: true
