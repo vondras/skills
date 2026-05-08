@@ -95,7 +95,8 @@ For each document:
 
 Set-level tests should cover:
 
-- reader routing: can a reader find the right doc for a task?
+- discoverability: using only document names, titles, and opening purpose statements, can a reader new to the set identify which document to consult for a given task — without a separate index or prior knowledge of the layout?
+- reader routing: do documents contain explicit cross-references and routing signals that guide readers once they are in the right place?
 - manifest consistency: do frontmatter IDs, document-set membership, related-doc links, and referenced artifacts line up?
 - source-of-truth boundaries: which doc/system is authoritative for each topic?
 - cross-document contradictions: factual or procedural disagreements
@@ -123,7 +124,7 @@ Separate fixes into:
 
 - **per-document fixes** — a specific doc is incomplete or ambiguous
 - **cross-document fixes** — contradictions, duplicated facts, terminology drift, or precedence conflicts
-- **set-level fixes** — missing index/routing, missing doc, missing ownership model, or source-of-truth map
+- **set-level fixes** — missing doc, missing ownership model, or source-of-truth map; for discoverability failures, prefer renaming a document, improving its title or purpose statement, or adding targeted cross-references over creating a new routing or index document
 
 ## Gate logic
 

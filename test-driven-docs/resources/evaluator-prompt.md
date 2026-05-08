@@ -108,7 +108,8 @@ For each document:
 
 After per-document evaluation, evaluate the set as a documentation system:
 
-- routing: can readers find the right document for the task?
+- discoverability: using only document names, titles, and opening purpose statements, can a reader new to the set identify which document to consult — without an index or prior knowledge of the layout?
+- routing: once in the right area, do explicit cross-references and routing signals guide the reader to the authoritative location?
 - manifest consistency: do frontmatter IDs, document-set membership, related-doc links, and referenced artifacts line up?
 - source of truth: does each important topic have an authoritative owner/doc?
 - contradictions: do documents disagree on factual or procedural claims?

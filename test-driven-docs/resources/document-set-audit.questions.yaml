@@ -54,6 +54,19 @@ document_tests:
       failure_risk: "Operator conflates per-document gaps with set-level routing issues, producing an unactionable fix plan."
       blocking: false
 
+    - id: dsa-discoverability-001
+      category: decisions
+      severity: high
+      reader_role: skill operator
+      question: "What set-level test category evaluates whether a new reader can navigate the document set without an index, and what are the acceptable fixes for a failed discoverability test?"
+      expected_answer_properties:
+        - names discoverability as a set-level test category distinct from reader routing
+        - states that discoverability tests whether document names, titles, and purpose statements alone guide new readers
+        - states that acceptable fixes include renaming documents, improving titles or purpose statements, and adding targeted cross-references
+        - states that creating a new routing or index document is not the preferred fix
+      failure_risk: "Operator treats every navigation gap as a missing-index problem and adds an index document, creating unnecessary maintenance overhead without improving the underlying organization."
+      blocking: false
+
     - id: dsa-output-shape-001
       category: execution
       severity: medium
