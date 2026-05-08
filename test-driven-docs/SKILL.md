@@ -129,12 +129,20 @@ Use these resources as needed:
 - `resources/tddoc.frontmatter.schema.yaml` — document-local test-driven-docs frontmatter manifest schema
 - `scripts/validate_artifacts.py` — deterministic YAML/schema/count validation helper
 
+Worked examples live in `resources/examples/`:
+
+- `s3-to-snowflake-external-table-ingestion-runbook.md` — a runbook with a full tddoc frontmatter manifest (Mode D/E single-document example)
+- `example.contract.yaml`, `example.questions.yaml`, `example.evaluation.yaml` — contract, test suite, and evaluation for the runbook above
+- `example.docset.questions.yaml`, `example.docset.evaluation.yaml` — test suite and evaluation for a multi-document API reference set (Mode F example)
+
+The test-driven-docs skill package itself — with tddoc frontmatter on each resource doc, a test suite per document, and a CI-validated artifact store — is a self-referential Mode F worked example.
+
 ## Interaction rules
 
 - If the user gives a document and asks for review, evaluate before rewriting.
 - If the user gives only an idea, start with a contract and tests.
 - If the user supplies only a document and no test suite, first inspect any test-driven-docs frontmatter for a referenced suite or inline tests; otherwise derive a test suite and label it as derived before evaluating.
 - If the user supplies multiple documents, use Mode F unless they explicitly ask to evaluate only one document. Use test-driven-docs frontmatter to establish each document's role, authority, routing, and local tests when present.
-- If evaluating something authored in the same session, evaluate adversarially and do not give credit for prior discussion or intent not present in the final document.
+- If evaluating something authored in the same session, evaluate adversarially and do not give credit for prior discussion or intent not present in the final document. In environments that support sub-agents, prefer delegating the evaluation phase to a sub-agent when the main agent authored the document being evaluated; this eliminates the risk of the evaluator drawing on session context that is not present in the document.
 - If the user asks for files, provide complete file contents or an updated package.
 - If the user asks for CI implementation, use deterministic checks where possible and mark LLM-based judgment as non-deterministic unless constrained by fixed model/version/settings.

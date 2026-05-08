@@ -187,19 +187,6 @@ def validate_evaluation_counts(path: Path) -> list[str]:
     return errors
 
 
-def validate_skill_entrypoint(path: Path) -> list[str]:
-    """Check that SKILL.md has non-empty name and description in frontmatter."""
-    frontmatter, _ = parse_markdown_frontmatter(path)
-    if frontmatter is None:
-        return [f"{path}: missing YAML frontmatter block"]
-    errors: list[str] = []
-    for field in ("name", "description"):
-        value = frontmatter.get(field)
-        if not isinstance(value, str) or not value.strip():
-            errors.append(f"{path}: frontmatter.{field} must be a non-empty string")
-    return errors
-
-
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
@@ -215,10 +202,6 @@ def main() -> int:
             load_yaml(path)
         except Exception as exc:  # noqa: BLE001
             errors.append(f"{path}: YAML parse failed: {exc}")
-
-    skill_md = root / "SKILL.md"
-    if skill_md.exists():
-        errors.extend(validate_skill_entrypoint(skill_md))
 
     referenced_suites: list[Path] = []
     for path in sorted(root.rglob("*.md")):

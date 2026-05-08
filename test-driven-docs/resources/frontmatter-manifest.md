@@ -53,6 +53,8 @@ Use YAML frontmatter as the document-local test-driven-docs manifest. The manife
 
 ## Default split
 
+The machine-readable schema for all frontmatter fields and allowed values is `resources/tddoc.frontmatter.schema.yaml`. This document describes the semantics, precedence rules, and examples; the schema is the authoritative source for required fields, types, and constraints.
+
 - Frontmatter is authoritative for document identity, role, audience summary, purpose summary, source-of-truth boundaries, freshness expectations, artifact routing, and set relationships.
 - External question-suite files are authoritative for full documentation tests when referenced by frontmatter.
 - External evaluation files are generated evidence and are never authoritative over the document, manifest, or test suite.
