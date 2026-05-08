@@ -88,6 +88,7 @@ For each document:
 - If the document has test-driven-docs frontmatter, use referenced `tests.suite` or `tests_inline` before deriving tests.
 - If no tests exist, derive a minimal suite from frontmatter, title, purpose, apparent audience, headings, and role in the set.
 - Label derived tests as derived.
+- **Run the suite expansion pass** (see `resources/workflow.md` Suite expansion) before evaluating: surface untested content sections and derive per-document candidate tests implied by the document's audience, purpose, authoritative_for, and body. Emit candidates under fix-plan category **suite_expansion**.
 - Evaluate using the same evidence rules as Mode D/E.
 - Do not give credit for information in another document unless this document clearly routes to that other document as authoritative for the question.
 
@@ -144,6 +145,7 @@ A set-level test passes only if the reader can reasonably find the right documen
 
 Separate fixes into:
 
+- **suite_expansion** — candidate tests surfaced during the expansion pass (per-document or set-level) that the operator should add to the suite or consciously discard; distinct from content fixes
 - **per-document fixes** — a specific doc is incomplete or ambiguous
 - **cross-document fixes** — contradictions, duplicated facts, terminology drift, or precedence conflicts
 - **set-level fixes** — missing doc, missing ownership model, or source-of-truth map; for discoverability failures, prefer renaming a document, improving its title or purpose statement, or adding targeted cross-references over creating a new routing or index document
@@ -196,6 +198,10 @@ evaluation:
     cross_document_findings: []
 
   consolidated_fix_plan:
+    - target: "doc-a.md"
+      kind: suite_expansion
+      reason: "Rollback section has no test exercising trigger conditions or success validation."
+      fix: "Add test: 'Under what conditions may rollback be initiated, and how is success validated?'"
     - target: "doc-a.md"
       kind: per_document
       reason: "Local rollback guidance missing."

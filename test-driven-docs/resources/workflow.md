@@ -169,7 +169,7 @@ When a suite is loaded (supplied by the operator, referenced via frontmatter, or
 
 ### Handling candidates
 
-In all three cases:
+For all three expansion types (per-document untested content, per-document logically-implied questions, set-level reader-journey questions):
 
 - Classify candidate-test severity using `resources/severity-calibration.md`.
 - Surface candidates for operator review rather than silently appending them to the suite.
@@ -292,6 +292,8 @@ Output the document, and include a short coverage note only when useful.
 Use when the user supplies a single document and wants gap analysis.
 
 If the user supplies a test suite, evaluate against it. If the document frontmatter references a test suite or contains `tests_inline`, use that before deriving tests. If the user supplies only a document with no usable tests, derive a default test suite from the document type and apparent audience. Surface the derived suite before evaluation or label each test with "derived because ..." so the user can challenge the rubric.
+
+Regardless of how the suite was obtained, run the **Suite expansion** pass (see Suite expansion section above) before evaluating: surface untested content and candidate tests, emit them under fix-plan category **suite_expansion**, then proceed to evaluation.
 
 Output:
 
