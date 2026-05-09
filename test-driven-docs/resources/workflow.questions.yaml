@@ -87,3 +87,42 @@ document_tests:
         - states that candidates are surfaced for operator review rather than silently appended
       failure_risk: "Operator conflates candidate test findings with content fixes, producing an unactionable fix plan."
       blocking: true
+
+    - id: workflow-phase3-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "How do I convert a reader question into a documentation test, and what makes a test well-formed?"
+      expected_answer_properties:
+        - states each material question becomes a test with expected answer properties
+        - shows a YAML template with required fields including id, category, severity, reader_role, question, expected_answer_properties, failure_risk, and blocking
+        - states a good test allows an evaluator to distinguish complete, partial, missing, contradictory, and inferred answers
+      failure_risk: "Operator produces tests with vague expected properties that cannot distinguish a partial answer from a full pass."
+      blocking: false
+
+    - id: workflow-phase4-001
+      category: execution
+      severity: medium
+      reader_role: skill operator
+      question: "What guidance does the workflow give for authoring or revising a document against its test suite?"
+      expected_answer_properties:
+        - states to use the contract and test suite as acceptance criteria
+        - states the document should answer tests through coherent structure, not by appending a FAQ
+        - provides a recommended section structure for operational or governance documents
+        - states to use only the sections that fit the artifact
+      failure_risk: "Operator appends a FAQ section to satisfy tests rather than integrating answers into the document's natural structure."
+      blocking: false
+
+    - id: workflow-eval-two-phase-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "How must Phase 5 separate evaluator reading from rubric grading, and which frontmatter fields are excluded versus permitted in Phase 1?"
+      expected_answer_properties:
+        - defines a Phase 1 reading pass using question, reader_role, document body, and structural frontmatter
+        - states tddoc.tests_inline is excluded from Phase 1 to prevent rubric leakage
+        - states tddoc.evaluation is excluded from Phase 1 to prevent verdict leakage
+        - prohibits exposing expected_answer_properties and failure_risk during Phase 1
+        - defines a Phase 2 grading pass that applies expected_answer_properties and failure_risk
+      failure_risk: "Operator either primes evaluation with embedded rubric or incorrectly blocks structural frontmatter needed for manifest consistency tests."
+      blocking: true

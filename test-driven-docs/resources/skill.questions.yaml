@@ -60,3 +60,17 @@ document_tests:
         - states that fixes should be minimal (smallest safe change)
       failure_risk: "Operator accepts unsupported inferences as passes or rewrites documents beyond what failing tests require."
       blocking: false
+
+    - id: skill-interaction-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "What interaction rules govern how I respond to different user request patterns — such as a document with no test suite, multiple documents, or a document authored in the same session?"
+      expected_answer_properties:
+        - states to evaluate before rewriting when the user provides a document for review
+        - states to start from a contract and tests when the user provides only an idea
+        - states to derive and label a test suite when the user supplies a document with no usable tests
+        - states to use Mode F when the user supplies multiple documents
+        - states to evaluate adversarially when evaluating a document authored in the same session
+      failure_risk: "Operator rewrites a document without evaluating it first, or skips Mode F when multiple documents are supplied."
+      blocking: false

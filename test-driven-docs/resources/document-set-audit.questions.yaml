@@ -115,3 +115,17 @@ document_tests:
         - frontmatter declares conflicting authority OR stale/missing artifact references that affect critical/high tests
       failure_risk: "Operator returns pass_with_warnings when stale frontmatter artifact references are silently degrading the audit quality."
       blocking: true
+
+    - id: dsa-two-phase-001
+      category: execution
+      severity: high
+      reader_role: skill operator
+      question: "How does Mode F apply the two-phase separation between evaluator reading and rubric grading, and which frontmatter fields are excluded versus permitted in Phase 1?"
+      expected_answer_properties:
+        - states per-document evaluation uses Phase 1 read pass before rubric grading
+        - states tddoc.tests_inline and tddoc.evaluation are excluded from Phase 1
+        - states structural frontmatter fields are permitted in Phase 1 for manifest and routing tests
+        - states set-level evaluation uses the same two-phase ordering
+        - states expected_answer_properties and failure_risk are applied in grading pass, not initial read
+      failure_risk: "Operator either evaluates with embedded rubric visible from the start, or incorrectly refuses structural frontmatter needed for manifest consistency tests."
+      blocking: true

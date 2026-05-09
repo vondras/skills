@@ -82,18 +82,41 @@ You will receive:
 - Contradictions in precedence, authority, approval, rollback, escalation, prohibited use, ownership, or source-of-truth boundaries are blocking unless explicitly marked otherwise.
 - **When a suite is supplied, audits must perform a suite expansion pass before evaluating against it.** Surface under-coverage and candidate tests rather than silently treating the supplied suite as complete. This rule applies at both the per-document level and the set-level (Layer-2) evaluation. See `resources/workflow.md` Suite expansion for the derivation procedure and `suite_expansion` fix-plan category.
 
-## Single-document evaluation
+## Two-phase evaluation model
 
-For each test:
+Evaluate each test using two sequential phases. This model uses a single evaluator with phased instructions (soft convention) rather than two separate agent invocations — the same bias-reduction effect at lower coordination cost.
 
-1. Answer the question using only the document.
+### Phase 1 — Evaluator reading pass (no rubric exposure)
+
+During the initial read, the evaluator must use only:
+
+- `question`
+- `reader_role`
+- the body of the supplied document(s)
+
+Do **not** read `tddoc.tests_inline` or `tddoc.evaluation` — `tests_inline` embeds grading rubric items directly in the document, and `evaluation.status` records a prior verdict; both can bias the reading pass. Other structural frontmatter fields (`id`, `document_set`, `authoritative_for`, `related_documents`, source-of-truth declarations, etc.) are available as evidence when the test concerns routing, authority, set membership, or manifest integrity.
+
+Do **not** expose or use `expected_answer_properties` or `failure_risk`. These are grading-rubric fields and must not guide the initial reading pass.
+
+For each test in Phase 1:
+
+1. Answer the question using only the document body.
 2. Identify exact supporting section, heading, table, or excerpt.
-3. Mark status as PASS, PARTIAL, FAIL, CONTRADICTORY, or NOT_APPLICABLE.
-4. Compare the answer to every expected answer property.
-5. List missing properties.
-6. Identify unsupported assumptions or inferences.
-7. Explain the risk created by the gap.
-8. Propose the minimal documentation change needed.
+3. Identify what is missing, vague, or contradictory for the target reader.
+4. Flag unsupported assumptions or inferences.
+
+### Phase 2 — Grading pass (rubric application)
+
+After the initial reading pass is complete, grade the Phase-1 result against the test rubric:
+
+1. Compare the answer to every `expected_answer_properties` item.
+2. List missing properties.
+3. Use `failure_risk` to calibrate severity and risk framing.
+4. Identify unsupported assumptions or inferences not already flagged in Phase 1.
+5. Assign status as PASS, PARTIAL, FAIL, CONTRADICTORY, or NOT_APPLICABLE.
+6. Explain the risk created by each gap.
+7. Propose the minimal documentation change needed.
+8. Populate `missing_properties`, `unsupported_inferences`, `risk`, and `minimal_fix` in the result.
 
 ## Document-set audits
 

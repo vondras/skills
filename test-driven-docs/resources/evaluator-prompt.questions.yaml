@@ -88,3 +88,34 @@ document_tests:
         - states candidates are emitted under suite_expansion fix-plan category
       failure_risk: "Evaluator treats the supplied suite as complete, missing untested content and logically-implied gaps."
       blocking: true
+
+    - id: eval-docset-shape-001
+      category: execution
+      severity: high
+      reader_role: evaluator
+      question: "What top-level shape must I return when evaluating a document set, and what does set_inventory contain?"
+      expected_answer_properties:
+        - names artifact_type document_set as the top-level discriminator
+        - includes set_inventory with per-document role, audience, and owned topics
+        - includes per_document_evaluations array
+        - includes set_level_evaluation with results and cross_document_findings
+        - includes consolidated_fix_plan
+      failure_risk: "Evaluator returns a single-document result shape for a set audit, omitting set_inventory and set_level_evaluation, making the output unusable for schema validation."
+      blocking: false
+
+    - id: eval-two-phase-001
+      category: execution
+      severity: high
+      reader_role: evaluator
+      question: "Does the evaluator prompt require a two-phase flow, and which frontmatter fields are excluded from Phase 1 versus which are permitted?"
+      expected_answer_properties:
+        - defines a two-phase model
+        - states the initial reading pass uses question and reader_role
+        - states document body is used in Phase 1
+        - states tddoc.tests_inline is excluded from Phase 1 because it embeds grading rubric items
+        - states tddoc.evaluation is excluded from Phase 1 because it records a prior verdict
+        - states structural frontmatter fields are permitted in Phase 1 for metadata and manifest tests
+        - explicitly says expected_answer_properties is grading-only
+        - explicitly says failure_risk is grading-only
+      failure_risk: "Evaluator either gets primed by rubric fields embedded in tests_inline, or incorrectly refuses to read structural frontmatter needed for manifest consistency tests."
+      blocking: true

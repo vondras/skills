@@ -81,12 +81,14 @@ properties:
               type: string
               minLength: 1
             expected_answer_properties:
+              description: "Grading-rubric field. Used in grading pass; do not expose to evaluator during the initial reading pass."
               type: array
               minItems: 1
               items:
                 type: string
                 minLength: 1
             failure_risk:
+              description: "Grading-rubric field for risk calibration. Used in grading pass; do not expose during the initial reading pass."
               type: string
               minLength: 1
             blocking:
