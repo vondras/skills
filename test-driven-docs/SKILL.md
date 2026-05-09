@@ -46,6 +46,8 @@ tddoc:
       relationship: elaborated_by
     - path: ./resources/frontmatter-manifest.md
       relationship: elaborated_by
+    - path: ./resources/severity-calibration.md
+      relationship: elaborated_by
   freshness:
     owner: skill-maintainer
     expectation: Review on each skill version bump or when referenced resources change.
