@@ -107,13 +107,15 @@ document_tests:
       category: execution
       severity: high
       reader_role: evaluator
-      question: "Does the evaluator prompt require a two-phase flow where the initial reading pass uses only question, reader_role, and document body — and does not expose expected_answer_properties, failure_risk, or tddoc frontmatter until grading?"
+      question: "Does the evaluator prompt require a two-phase flow, and which frontmatter fields are excluded from Phase 1 versus which are permitted?"
       expected_answer_properties:
         - defines a two-phase model
         - states the initial reading pass uses question and reader_role
         - states document body is used in Phase 1
-        - explicitly states tddoc frontmatter is excluded from Phase 1
+        - states tddoc.tests_inline is excluded from Phase 1 because it embeds grading rubric items
+        - states tddoc.evaluation is excluded from Phase 1 because it records a prior verdict
+        - states structural frontmatter fields are permitted in Phase 1 for metadata and manifest tests
         - explicitly says expected_answer_properties is grading-only
         - explicitly says failure_risk is grading-only
-      failure_risk: "Evaluator gets primed by rubric fields or frontmatter and returns biased false passes or suppressed independent risk findings."
+      failure_risk: "Evaluator either gets primed by rubric fields embedded in tests_inline, or incorrectly refuses to read structural frontmatter needed for manifest consistency tests."
       blocking: true

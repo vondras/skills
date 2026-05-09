@@ -117,11 +117,12 @@ document_tests:
       category: execution
       severity: high
       reader_role: skill operator
-      question: "How must Phase 5 separate evaluator reading from rubric grading?"
+      question: "How must Phase 5 separate evaluator reading from rubric grading, and which frontmatter fields are excluded versus permitted in Phase 1?"
       expected_answer_properties:
-        - defines a Phase 1 reading pass using only question and reader_role with document body
-        - states tddoc frontmatter is excluded from Phase 1
+        - defines a Phase 1 reading pass using question, reader_role, document body, and structural frontmatter
+        - states tddoc.tests_inline is excluded from Phase 1 to prevent rubric leakage
+        - states tddoc.evaluation is excluded from Phase 1 to prevent verdict leakage
         - prohibits exposing expected_answer_properties and failure_risk during Phase 1
         - defines a Phase 2 grading pass that applies expected_answer_properties and failure_risk
-      failure_risk: "Operator primes evaluation with rubric hints or frontmatter, creating biased scoring and weaker gap detection."
+      failure_risk: "Operator either primes evaluation with embedded rubric or incorrectly blocks structural frontmatter needed for manifest consistency tests."
       blocking: true

@@ -120,11 +120,12 @@ document_tests:
       category: execution
       severity: high
       reader_role: skill operator
-      question: "How does Mode F apply the two-phase separation between evaluator reading and rubric grading?"
+      question: "How does Mode F apply the two-phase separation between evaluator reading and rubric grading, and which frontmatter fields are excluded versus permitted in Phase 1?"
       expected_answer_properties:
         - states per-document evaluation uses Phase 1 read pass before rubric grading
-        - states tddoc frontmatter is excluded from Phase 1 reading pass
+        - states tddoc.tests_inline and tddoc.evaluation are excluded from Phase 1
+        - states structural frontmatter fields are permitted in Phase 1 for manifest and routing tests
         - states set-level evaluation uses the same two-phase ordering
         - states expected_answer_properties and failure_risk are applied in grading pass, not initial read
-      failure_risk: "Operator evaluates with rubric-visible prompting from the start, biasing both per-document and set-level findings."
+      failure_risk: "Operator either evaluates with embedded rubric visible from the start, or incorrectly refuses structural frontmatter needed for manifest consistency tests."
       blocking: true

@@ -225,7 +225,7 @@ Evaluate using only the supplied document(s). Do not rely on outside knowledge, 
 
 Use a two-phase flow:
 
-1. **Phase 1 — Evaluator reading pass**: use only `question` and `reader_role` (plus the document body) to produce an answer, evidence, and identified gaps/ambiguities. Do not read or use the `tddoc` frontmatter block — a human reader would not see it. Do not expose or use `expected_answer_properties` or `failure_risk` during this phase.
+1. **Phase 1 — Evaluator reading pass**: use `question`, `reader_role`, the document body, and structural frontmatter fields (`id`, `document_set`, `authoritative_for`, `related_documents`, source-of-truth declarations, etc.) as evidence. Do **not** read `tddoc.tests_inline` or `tddoc.evaluation` — `tests_inline` embeds grading rubric items and `evaluation.status` records a prior verdict, both of which bias the reading pass. Do not expose or use `expected_answer_properties` or `failure_risk` during this phase.
 2. **Phase 2 — Grading pass**: apply `expected_answer_properties` and `failure_risk` to assign status and complete all grading fields.
 
 This model uses a single evaluator agent with phased instructions (soft convention) rather than two separate agent invocations.
@@ -233,7 +233,7 @@ This model uses a single evaluator agent with phased instructions (soft conventi
 **Design decisions:**
 - Hard vs. soft separation: soft (single agent, phased instructions). Equivalent bias-reduction; lower coordination cost.
 - `failure_risk` is not renamed. Schema descriptions mark it as grading-only; a rename would require updating all existing `.questions.yaml` files.
-- `reader_role` is sufficient Phase 1 context. `tddoc` frontmatter is excluded — a human reader cannot see it.
+- Structural frontmatter is available in Phase 1 for metadata and manifest tests; only `tddoc.tests_inline` and `tddoc.evaluation` are excluded to prevent rubric and verdict leakage.
 
 For each test result, produce:
 

@@ -94,7 +94,7 @@ During the initial read, the evaluator must use only:
 - `reader_role`
 - the body of the supplied document(s)
 
-Do **not** read or use the `tddoc` frontmatter block. A real reader sees only rendered content, not YAML frontmatter; the evaluator must simulate that reading experience.
+Do **not** read `tddoc.tests_inline` or `tddoc.evaluation` — `tests_inline` embeds grading rubric items directly in the document, and `evaluation.status` records a prior verdict; both can bias the reading pass. Other structural frontmatter fields (`id`, `document_set`, `authoritative_for`, `related_documents`, source-of-truth declarations, etc.) are available as evidence when the test concerns routing, authority, set membership, or manifest integrity.
 
 Do **not** expose or use `expected_answer_properties` or `failure_risk`. These are grading-rubric fields and must not guide the initial reading pass.
 
