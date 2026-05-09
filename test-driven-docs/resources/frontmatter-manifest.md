@@ -45,6 +45,8 @@ tddoc:
       relationship: entry_point_for
     - path: ./workflow.md
       relationship: used_by
+    - path: ./document-set-audit.md
+      relationship: used_by
   freshness:
     owner: skill-maintainer
     expectation: Review on each skill version bump or when referenced resources change.

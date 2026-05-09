@@ -187,6 +187,39 @@ def validate_evaluation_counts(path: Path) -> list[str]:
     return errors
 
 
+def check_duplicate_roles_in_set(root: Path) -> tuple[list[str], list[str]]:
+    """Error on duplicate entry_point/index roles; warn on other duplicate roles within a set."""
+    # role_in_set values that must be unique within a document set
+    unique_roles = {"entry_point", "index"}
+
+    from collections import defaultdict
+    set_roles: dict[str, dict[str, list[Path]]] = defaultdict(lambda: defaultdict(list))
+
+    for path in sorted(root.rglob("*.md")):
+        if path.name == "authoring-template.md":
+            continue
+        frontmatter, _ = parse_markdown_frontmatter(path)
+        if not frontmatter or "tddoc" not in frontmatter:
+            continue
+        tddoc = frontmatter.get("tddoc") or {}
+        doc_set = tddoc.get("document_set")
+        role = tddoc.get("role_in_set")
+        if doc_set and role:
+            set_roles[doc_set][role].append(path.resolve())
+
+    errors: list[str] = []
+    warnings: list[str] = []
+    for doc_set, roles in sorted(set_roles.items()):
+        for role, paths in sorted(roles.items()):
+            if len(paths) > 1:
+                names = ", ".join(str(p.relative_to(root)) for p in paths)
+                if role in unique_roles:
+                    errors.append(f"document_set '{doc_set}': role_in_set '{role}' claimed by {len(paths)} documents: {names}")
+                else:
+                    warnings.append(f"WARN: document_set '{doc_set}': role_in_set '{role}' claimed by {len(paths)} documents: {names}")
+    return errors, warnings
+
+
 def check_bidirectional_related_documents(root: Path) -> list[str]:
     """Warn when document A lists document B but B has no link back to A."""
     # Build a map: absolute_path -> list of absolute paths it links to
@@ -269,6 +302,11 @@ def main() -> int:
     for path in [examples / "example.evaluation.yaml", examples / "example.docset.evaluation.yaml"]:
         if path.exists():
             errors.extend(validate_evaluation_counts(path))
+
+    role_errors, role_warnings = check_duplicate_roles_in_set(root)
+    errors.extend(role_errors)
+    for warning in role_warnings:
+        print(warning, file=sys.stderr)
 
     for warning in check_bidirectional_related_documents(root):
         print(warning, file=sys.stderr)
